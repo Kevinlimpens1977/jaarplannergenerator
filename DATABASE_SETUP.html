@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supabase Database Setup - DaCapo Jaarplanner</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            line-height: 1.6;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2563eb;
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #1e40af;
+            margin-top: 30px;
+        }
+        .step {
+            background: #eff6ff;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #2563eb;
+            border-radius: 4px;
+        }
+        .warning {
+            background: #fef3c7;
+            border-left-color: #f59e0b;
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        .success {
+            background: #d1fae5;
+            border-left-color: #10b981;
+            border-left: 4px solid #10b981;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        code {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        a {
+            color: #2563eb;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .button {
+            display: inline-block;
+            background: #2563eb;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin: 10px 5px 10px 0;
+            text-decoration: none;
+        }
+        .button:hover {
+            background: #1d4ed8;
+            text-decoration: none;
+        }
+        .checklist {
+            list-style: none;
+            padding-left: 0;
+        }
+        .checklist li {
+            padding: 8px 0;
+        }
+        .checklist li:before {
+            content: "☐ ";
+            color: #2563eb;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 DaCapo Jaarplanner - Database Setup</h1>
+        
+        <div class="warning">
+            <strong>⚠️ BELANGRIJK:</strong> Je moet de database migraties handmatig uitvoeren in Supabase voordat de applicatie werkt!
+        </div>
+
+        <h2>📝 Stap 1: Open Supabase SQL Editor</h2>
+        <div class="step">
+            <p>Klik op de onderstaande knop om direct naar de SQL Editor te gaan:</p>
+            <a href="https://supabase.com/dashboard/project/xpznbstpykeidsqovjla/sql" class="button" target="_blank">
+                Open Supabase SQL Editor →
+            </a>
+        </div>
+
+        <h2>🏗️ Stap 2: Voer Schema Migratie Uit</h2>
+        <div class="step">
+            <ol>
+                <li>Klik in de SQL Editor op <strong>"New Query"</strong></li>
+                <li>Open het bestand: <code>supabase/migrations/001_initial_schema.sql</code></li>
+                <li>Kopieer de VOLLEDIGE inhoud (Ctrl+A, Ctrl+C)</li>
+                <li>Plak in de Supabase SQL Editor</li>
+                <li>Klik op <strong>"Run"</strong> (of druk F5)</li>
+                <li>Wacht op groene succesvol melding</li>
+            </ol>
+            <p><strong>Dit creëert:</strong></p>
+            <ul>
+                <li>5 tabellen (users, calendars, events, event_calendars, approvals_log)</li>
+                <li>Custom types (user_role, event_status)</li>
+                <li>Indexes en triggers</li>
+            </ul>
+        </div>
+
+        <h2>🌱 Stap 3: Voer Seed Data In</h2>
+        <div class="step">
+            <ol>
+                <li>Maak een nieuwe query aan (klik opnieuw op <strong>"New Query"</strong>)</li>
+                <li>Open het bestand: <code>supabase/migrations/002_seed_data.sql</code></li>
+                <li>Kopieer de VOLLEDIGE inhoud</li>
+                <li>Plak in de SQL Editor</li>
+                <li>Klik op <strong>"Run"</strong></li>
+            </ol>
+            <p><strong>Dit voegt toe:</strong></p>
+            <ul>
+                <li>7 standaard kalenders (Algemeen, BB/KB OB, GT OB, etc.)</li>
+                <li>3 test gebruikers</li>
+                <li>4 voorbeeld activiteiten</li>
+            </ul>
+        </div>
+
+        <h2>✅ Stap 4: Verificatie</h2>
+        <div class="step">
+            <p>Controleer of alles succesvol is aangemaakt door deze query uit te voeren:</p>
+            <pre>-- Controleer tabellen
+SELECT table_name 
+FROM information_schema.tables 
+WHERE table_schema = 'public'
+ORDER BY table_name;
+
+-- Controleer kalenders (moet 7 rijen tonen)
+SELECT code, name, color FROM calendars ORDER BY name;
+
+-- Controleer events (moet 4 voorbeelden tonen)
+SELECT title, status, school_year FROM events ORDER BY start_datetime;</pre>
+            
+            <p><strong>Je zou moeten zien:</strong></p>
+            <ul class="checklist">
+                <li>5 tabellen: approvals_log, calendars, event_calendars, events, users</li>
+                <li>7 kalenders met codes: ALG, BBKB_BB_MLN, BBKB_OB, BBBK_BB_HVK, GT_BB, GT_OB, KWAL</li>
+                <li>4 events: Herfstvakantie, Open Dag, Kerstvakantie, Toetsweek</li>
+            </ul>
+        </div>
+
+        <div class="success">
+            <h2>🎉 Klaar!</h2>
+            <p>Als alle verificaties succesvol zijn, is de database klaar voor gebruik.</p>
+            <p>De development server draait al op: <a href="http://localhost:3000" target="_blank">http://localhost:3000</a></p>
+        </div>
+
+        <h2>📂 Bestandslocaties</h2>
+        <div class="step">
+            <p><strong>SQL Migraties:</strong></p>
+            <ul>
+                <li><code>C:\Users\Kevin\projecten\jaarplanner_generator\supabase\migrations\001_initial_schema.sql</code></li>
+                <li><code>C:\Users\Kevin\projecten\jaarplanner_generator\supabase\migrations\002_seed_data.sql</code></li>
+            </ul>
+            <p>Je kunt deze bestanden openen in VS Code en de inhoud kopiëren.</p>
+        </div>
+
+        <h2>🔧 Troubleshooting</h2>
+        <div class="warning">
+            <p><strong>Error: "type user_role already exists"</strong></p>
+            <p>→ De migratie is al eerder uitgevoerd. Je kunt veilig doorgaan.</p>
+            
+            <p><strong>Error: "relation calendars already exists"</strong></p>
+            <p>→ De tabellen bestaan al. Sla stap 2 over en ga direct naar stap 3 (seed data).</p>
+            
+            <p><strong>Applicatie toont geen events</strong></p>
+            <p>→ Controleer of de seed data is ingevoerd EN of de status van events "goedgekeurd" is.</p>
+        </div>
+
+        <h2>🔗 Nuttige Links</h2>
+        <div class="step">
+            <ul>
+                <li><a href="https://supabase.com/dashboard/project/xpznbstpykeidsqovjla" target="_blank">Supabase Project Dashboard</a></li>
+                <li><a href="https://supabase.com/dashboard/project/xpznbstpykeidsqovjla/editor" target="_blank">Supabase Table Editor</a></li>
+                <li><a href="https://supabase.com/dashboard/project/xpznbstpykeidsqovjla/sql" target="_blank">Supabase SQL Editor</a></li>
+                <li><a href="http://localhost:3000" target="_blank">DaCapo Jaarplanner (Local)</a></li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
