@@ -284,3 +284,188 @@ export async function getUserById(id: string) {
   if (error) throw error;
   return data as User;
 }
+
+// ============ ADVANCED EVENT OPERATIONS ============
+
+export async function copyEventToMultipleDates(
+  eventId: string,
+  targetDates: string[],
+  schoolYear: string
+) {
+  if (!supabase) {
+    throw new Error('Supabase client is not initialized');
+  }
+
+  // Get the original event with calendar relationships
+  const { data: originalEvent, error: fetchError } = await supabase
+    .from('events')
+    .select(`
+      *,
+      event_calendars (calendar_id)
+    `)
+    .eq('id', eventId)
+    .single();
+
+  if (fetchError || !originalEvent) {
+    console.error('Error fetching original event:', fetchError);
+    throw fetchError || new Error('Event not found');
+  }
+
+  // Calculate time offset from original date to each target date
+  const originalStart = new Date(originalEvent.start_datetime);
+  const originalEnd = new Date(originalEvent.end_datetime);
+  const duration = originalEnd.getTime() - originalStart.getTime();
+
+  const createdEvents = [];
+
+  for (const targetDateStr of targetDates) {
+    const targetDate = new Date(targetDateStr);
+    const newStartTime = new Date(
+      targetDate.getFullYear(),
+      targetDate.getMonth(),
+      targetDate.getDate(),
+      originalStart.getHours(),
+      originalStart.getMinutes(),
+      originalStart.getSeconds()
+    );
+    const newEndTime = new Date(newStartTime.getTime() + duration);
+
+    // Create new event
+    const newEvent = {
+      title: originalEvent.title,
+      description: originalEvent.description,
+      start_datetime: newStartTime.toISOString(),
+      end_datetime: newEndTime.toISOString(),
+      all_day: originalEvent.all_day,
+      location: originalEvent.location,
+      audience: originalEvent.audience,
+      category: originalEvent.category,
+      school_year: schoolYear,
+      status: 'approved',
+      created_by: originalEvent.created_by,
+      approved_by: originalEvent.approved_by,
+      approved_at: new Date().toISOString()
+    };
+
+    const { data: createdEvent, error: createError } = await supabase
+      .from('events')
+      .insert(newEvent)
+      .select()
+      .single();
+
+    if (createError || !createdEvent) {
+      console.error('Error creating event copy:', createError);
+      continue; // Skip this date but continue with others
+    }
+
+    // Copy calendar relationships
+    if (originalEvent.event_calendars && originalEvent.event_calendars.length > 0) {
+      const eventCalendars = originalEvent.event_calendars.map((ec: any) => ({
+        event_id: createdEvent.id,
+        calendar_id: ec.calendar_id
+      }));
+
+      const { error: calendarError } = await supabase
+        .from('event_calendars')
+        .insert(eventCalendars);
+
+      if (calendarError) {
+        console.error('Error creating event_calendars for copy:', calendarError);
+      }
+    }
+
+    createdEvents.push(createdEvent);
+  }
+
+  return createdEvents;
+}
+
+export async function batchCreateEvents(
+  eventTemplate: {
+    title: string;
+    description?: string;
+    start_time: string;
+    end_time: string;
+    all_day: boolean;
+    location?: string;
+    audience?: string;
+    category?: string;
+    calendar_ids: string[];
+  },
+  dates: string[],
+  schoolYear: string = '2026-2027'
+) {
+  if (!supabase) {
+    throw new Error('Supabase client is not initialized');
+  }
+
+  const user = await getCurrentUser();
+  const createdEvents = [];
+
+  for (const dateStr of dates) {
+    const date = new Date(dateStr);
+    
+    let startDatetime: Date;
+    let endDatetime: Date;
+
+    if (eventTemplate.all_day) {
+      startDatetime = new Date(date.setHours(0, 0, 0, 0));
+      endDatetime = new Date(date.setHours(23, 59, 59, 999));
+    } else {
+      const [startHour, startMinute] = eventTemplate.start_time.split(':').map(Number);
+      const [endHour, endMinute] = eventTemplate.end_time.split(':').map(Number);
+      
+      startDatetime = new Date(date);
+      startDatetime.setHours(startHour, startMinute, 0, 0);
+      
+      endDatetime = new Date(date);
+      endDatetime.setHours(endHour, endMinute, 0, 0);
+    }
+
+    // Create event
+    const newEvent = {
+      title: eventTemplate.title,
+      description: eventTemplate.description || null,
+      start_datetime: startDatetime.toISOString(),
+      end_datetime: endDatetime.toISOString(),
+      all_day: eventTemplate.all_day,
+      location: eventTemplate.location || null,
+      audience: eventTemplate.audience || null,
+      category: eventTemplate.category || null,
+      school_year: schoolYear,
+      status: 'approved',
+      created_by: user.id,
+      approved_by: user.id,
+      approved_at: new Date().toISOString()
+    };
+
+    const { data: createdEvent, error: createError } = await supabase
+      .from('events')
+      .insert(newEvent)
+      .select()
+      .single();
+
+    if (createError || !createdEvent) {
+      console.error('Error creating batch event:', createError);
+      continue;
+    }
+
+    // Create calendar relationships
+    const eventCalendars = eventTemplate.calendar_ids.map(calendarId => ({
+      event_id: createdEvent.id,
+      calendar_id: calendarId
+    }));
+
+    const { error: calendarError } = await supabase
+      .from('event_calendars')
+      .insert(eventCalendars);
+
+    if (calendarError) {
+      console.error('Error creating event_calendars for batch:', calendarError);
+    }
+
+    createdEvents.push(createdEvent);
+  }
+
+  return createdEvents;
+}

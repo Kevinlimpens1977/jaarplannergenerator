@@ -1,7 +1,7 @@
 import { format, startOfWeek, endOfWeek, addDays, addWeeks, subWeeks, getWeek, isSameDay, parseISO } from 'date-fns';
 import { nl } from 'date-fns/locale';
 
-export function getWeekDates(date: Date) {
+export function getWeekDates(date: Date, workweekOnly: boolean = false) {
   const start = startOfWeek(date, { weekStartsOn: 1 }); // Maandag
   const end = endOfWeek(date, { weekStartsOn: 1 }); // Zondag
   
@@ -9,7 +9,10 @@ export function getWeekDates(date: Date) {
   let currentDate = start;
   
   while (currentDate <= end) {
-    dates.push(currentDate);
+    // If workweek only, skip Saturday (6) and Sunday (0)
+    if (!workweekOnly || (currentDate.getDay() !== 0 && currentDate.getDay() !== 6)) {
+      dates.push(currentDate);
+    }
     currentDate = addDays(currentDate, 1);
   }
   

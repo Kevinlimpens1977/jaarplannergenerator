@@ -1,11 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getEvents, deleteEvent, getCalendars } from '@/lib/supabase/queries';
+import { getEvents, deleteEvent, getCalendars, updateEvent, copyEventToMultipleDates, batchCreateEvents } from '@/lib/supabase/queries';
 import type { EventWithDetails, Calendar } from '@/lib/types/database';
 import { format, parseISO } from 'date-fns';
 import { nl } from 'date-fns/locale';
 import Link from 'next/link';
+import EditEventModal from '@/components/admin/EditEventModal';
+import CopyEventModal from '@/components/admin/CopyEventModal';
+import BatchCreateModal from '@/components/admin/BatchCreateModal';
 
 export default function AdminEventsPage() {
   const [events, setEvents] = useState<EventWithDetails[]>([]);
@@ -15,6 +18,12 @@ export default function AdminEventsPage() {
   const [selectedSchoolYear, setSelectedSchoolYear] = useState('2026/2027');
   const [selectedCalendarIds, setSelectedCalendarIds] = useState<string[]>([]);
   const [deleteInProgress, setDeleteInProgress] = useState<string | null>(null);
+  
+  // Modal states
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [copyModalOpen, setCopyModalOpen] = useState(false);
+  const [batchCreateModalOpen, setBatchCreateModalOpen] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<EventWithDetails | null>(null);
 
   useEffect(() => {
     loadCalendars();
@@ -71,6 +80,38 @@ export default function AdminEventsPage() {
     } finally {
       setDeleteInProgress(null);
     }
+  };
+
+  const handleEdit = (event: EventWithDetails) => {
+    setSelectedEvent(event);
+    setEditModalOpen(true);
+  };
+
+  const handleSaveEdit = async (eventId: string, updates: any) => {
+    await updateEvent(eventId, updates, updates.calendar_ids);
+    alert('Activiteit bijgewerkt');
+    await loadEvents();
+  };
+
+  const handleCopy = (event: EventWithDetails) => {
+    setSelectedEvent(event);
+    setCopyModalOpen(true);
+  };
+
+  const handleSaveCopy = async (eventId: string, targetDates: string[], targetSchoolYear: string) => {
+    // Convert 2026/2027 format to 2026-2027 for database
+    const dbSchoolYear = targetSchoolYear.replace('/', '-');
+    const result = await copyEventToMultipleDates(eventId, targetDates, dbSchoolYear);
+    alert(`${result.length} activiteit(en) gekopieerd`);
+    await loadEvents();
+  };
+
+  const handleBatchCreate = async (eventData: any, dates: string[]) => {
+    // Convert 2026/2027 format to 2026-2027 for database
+    const dbSchoolYear = selectedSchoolYear.replace('/', '-');
+    const result = await batchCreateEvents(eventData, dates, dbSchoolYear);
+    alert(`${result.length} activiteit(en) aangemaakt`);
+    await loadEvents();
   };
 
   const handleCalendarToggle = (calendarId: string) => {
@@ -132,12 +173,23 @@ export default function AdminEventsPage() {
     <div className="container mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold text-gray-800">Alle activiteiten beheren</h1>
-        <Link
-          href="/submit"
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-        >
-          + Nieuwe activiteit
-        </Link>
+        <div className="flex gap-3">
+          <button
+            onClick={() => setBatchCreateModalOpen(true)}
+            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors flex items-center gap-2"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            Meerdaags project
+          </button>
+          <Link
+            href="/submit"
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+          >
+            + Nieuwe activiteit
+          </Link>
+        </div>
       </div>
 
       {/* Filters */}
@@ -267,6 +319,18 @@ export default function AdminEventsPage() {
                     <td className="px-6 py-4">
                       <div className="flex gap-2">
                         <button
+                          onClick={() => handleEdit(event)}
+                          className="text-blue-600 hover:text-blue-800 text-sm"
+                        >
+                          Bewerken
+                        </button>
+                        <button
+                          onClick={() => handleCopy(event)}
+                          className="text-purple-600 hover:text-purple-800 text-sm"
+                        >
+                          Kopiëren
+                        </button>
+                        <button
                           onClick={() => handleDelete(event.id, event.title)}
                           disabled={deleteInProgress === event.id}
                           className="text-red-600 hover:text-red-800 text-sm disabled:text-gray-400"
@@ -283,14 +347,34 @@ export default function AdminEventsPage() {
         </div>
       )}
 
-      <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <h3 className="font-semibold text-blue-800 mb-2">Toekomstige functionaliteit:</h3>
-        <ul className="text-sm text-blue-700 space-y-1">
-          <li>• Activiteiten bewerken (edit functie)</li>
-          <li>• Activiteiten kopiëren naar andere datums/schooljaren</li>
-          <li>• Meerdaagse projecten aanmaken (batch create)</li>
-        </ul>
-      </div>
+      {/* Modals */}
+      <EditEventModal
+        event={selectedEvent}
+        calendars={calendars}
+        isOpen={editModalOpen}
+        onClose={() => {
+          setEditModalOpen(false);
+          setSelectedEvent(null);
+        }}
+        onSave={handleSaveEdit}
+      />
+
+      <CopyEventModal
+        event={selectedEvent}
+        isOpen={copyModalOpen}
+        onClose={() => {
+          setCopyModalOpen(false);
+          setSelectedEvent(null);
+        }}
+        onCopy={handleSaveCopy}
+      />
+
+      <BatchCreateModal
+        calendars={calendars}
+        isOpen={batchCreateModalOpen}
+        onClose={() => setBatchCreateModalOpen(false)}
+        onBatchCreate={handleBatchCreate}
+      />
     </div>
   );
 }

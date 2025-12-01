@@ -17,6 +17,7 @@ export default function PlannerPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'week' | 'month'>('week');
+  const [workweekOnly, setWorkweekOnly] = useState(true);
   const [showSubscribeModal, setShowSubscribeModal] = useState(false);
   const [subscribeUrl, setSubscribeUrl] = useState('');
 
@@ -26,7 +27,7 @@ export default function PlannerPage() {
     console.log('ENV Check - Key length:', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.length);
   }, []);
 
-  const weekDates = getWeekDates(currentDate);
+  const weekDates = getWeekDates(currentDate, workweekOnly);
 
   // Load calendars
   useEffect(() => {
@@ -188,6 +189,29 @@ export default function PlannerPage() {
               Maand (4 weken)
             </button>
           </div>
+          {/* Workweek/Full Week Toggle */}
+          <div className="flex items-center bg-gray-200 rounded-lg p-1">
+            <button
+              onClick={() => setWorkweekOnly(true)}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                workweekOnly
+                  ? 'bg-white text-green-600 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-800'
+              }`}
+            >
+              Ma-Vr
+            </button>
+            <button
+              onClick={() => setWorkweekOnly(false)}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                !workweekOnly
+                  ? 'bg-white text-green-600 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-800'
+              }`}
+            >
+              Ma-Zo
+            </button>
+          </div>
           <button 
             onClick={handleSubscribeCalendar}
             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-sm flex items-center gap-2"
@@ -237,7 +261,7 @@ export default function PlannerPage() {
           {[0, 1, 2, 3].map((weekOffset) => {
             const weekStartDate = new Date(currentDate);
             weekStartDate.setDate(weekStartDate.getDate() + (weekOffset * 7));
-            const offsetWeekDates = getWeekDates(weekStartDate);
+            const offsetWeekDates = getWeekDates(weekStartDate, workweekOnly);
             
             return (
               <div key={weekOffset} className="border-t-2 border-gray-300 pt-4">
