@@ -39,17 +39,23 @@ export default function WeekView({ weekDates, events, selectedCalendarIds }: Wee
 
   if (selectedCalendarIds.length === 0) {
     return (
-      <div className="bg-white p-8 rounded-lg shadow-md text-center">
-        <p className="text-gray-600">
-          Selecteer minimaal één kalender om activiteiten te zien.
+      <div className="bg-white p-12 rounded-xl shadow-sm border border-gray-100 text-center">
+        <div className="text-dacapo-blue-100 mb-4">
+          <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+        </div>
+        <h3 className="text-lg font-semibold text-gray-900 mb-2">Geen kalenders geselecteerd</h3>
+        <p className="text-gray-500">
+          Selecteer minimaal één kalender in de filters om activiteiten te zien.
         </p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden">
-      <div className="grid grid-cols-7 gap-px bg-gray-200">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className={`grid gap-px bg-gray-200 ${weekDates.length === 5 ? 'grid-cols-1 md:grid-cols-5' : 'grid-cols-1 md:grid-cols-7'}`}>
         {weekDates.map((date) => {
           const dayEvents = getEventsForDay(date);
           const isToday = isWithinInterval(new Date(), {
@@ -58,19 +64,26 @@ export default function WeekView({ weekDates, events, selectedCalendarIds }: Wee
           });
 
           return (
-            <div key={date.toISOString()} className="bg-white min-h-[300px]">
+            <div key={date.toISOString()} className="bg-white min-h-[200px] md:min-h-[400px] flex flex-col">
               <div
-                className={`p-3 border-b-2 ${
-                  isToday ? 'bg-blue-50 border-blue-500' : 'bg-gray-50 border-gray-200'
+                className={`p-4 border-b ${
+                  isToday 
+                    ? 'bg-dacapo-blue-50 border-dacapo-blue-200' 
+                    : 'bg-gray-50/50 border-gray-100'
                 }`}
               >
-                <div className={`font-semibold ${isToday ? 'text-blue-600' : 'text-gray-800'}`}>
-                  {formatDateHeader(date)}
+                <div className={`font-semibold text-sm md:text-base ${isToday ? 'text-dacapo-blue-600' : 'text-gray-700'}`}>
+                  <div className="capitalize">{formatDateHeader(date).dayName}</div>
+                  <div className="text-xs md:text-sm font-normal text-gray-500 mt-0.5">
+                    {formatDateHeader(date).date}
+                  </div>
                 </div>
               </div>
-              <div className="p-3">
+              <div className="p-3 flex-1 space-y-2">
                 {dayEvents.length === 0 ? (
-                  <p className="text-sm text-gray-400 italic">Geen activiteiten</p>
+                  <div className="h-full flex items-center justify-center">
+                    <p className="text-xs text-gray-300 italic">Geen activiteiten</p>
+                  </div>
                 ) : (
                   dayEvents.map((event) => (
                     <EventChip key={event.id} event={event} />

@@ -1,12 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getWeekDates, getNextWeek, getPreviousWeek } from '@/lib/utils/dateUtils';
+import { getWeekDates, getNextWeek, getPreviousWeek, getMonthDates, getNextMonth, getPreviousMonth, getMonthName, formatWeekNumber } from '@/lib/utils/dateUtils';
 import { getCalendars, getEvents } from '@/lib/supabase/queries';
 import type { Calendar, EventWithDetails } from '@/lib/types/database';
 import PlannerFilters from '@/components/planner/PlannerFilters';
-import WeekNavigation from '@/components/planner/WeekNavigation';
 import WeekView from '@/components/planner/WeekView';
+import MonthView from '@/components/planner/MonthView';
 import SubscribeModal from '@/components/SubscribeModal';
 
 export default function PlannerPage() {
@@ -18,6 +18,7 @@ export default function PlannerPage() {
   const [error, setError] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'week' | 'month'>('week');
   const [workweekOnly, setWorkweekOnly] = useState(true);
+  const [selectedSchoolYear, setSelectedSchoolYear] = useState('2025/2026');
   const [showSubscribeModal, setShowSubscribeModal] = useState(false);
   const [subscribeUrl, setSubscribeUrl] = useState('');
 
@@ -26,8 +27,6 @@ export default function PlannerPage() {
     console.log('ENV Check - URL:', process.env.NEXT_PUBLIC_SUPABASE_URL);
     console.log('ENV Check - Key length:', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.length);
   }, []);
-
-  const weekDates = getWeekDates(currentDate, workweekOnly);
 
   // Load calendars
   useEffect(() => {
@@ -49,18 +48,28 @@ export default function PlannerPage() {
     loadCalendars();
   }, []);
 
-  // Load events for current week
+  // Load events based on current view and date
   useEffect(() => {
     async function loadEvents() {
       if (calendars.length === 0) return;
 
       setLoading(true);
       try {
-        const startDate = weekDates[0].toISOString();
-        const endDate = weekDates[weekDates.length - 1].toISOString();
+        let startDate: string;
+        let endDate: string;
+
+        if (viewMode === 'week') {
+          const weekDates = getWeekDates(currentDate, false); // Always fetch full week to be safe
+          startDate = weekDates[0].toISOString();
+          endDate = weekDates[weekDates.length - 1].toISOString();
+        } else {
+          const monthDates = getMonthDates(currentDate, false); // Always fetch full month to be safe
+          startDate = monthDates[0].toISOString();
+          endDate = monthDates[monthDates.length - 1].toISOString();
+        }
         
         const data = await getEvents({
-          school_year: '2026/2027',
+          school_year: selectedSchoolYear,
           calendar_ids: selectedCalendarIds,
           start_date: startDate,
           end_date: endDate,
@@ -78,7 +87,7 @@ export default function PlannerPage() {
     }
 
     loadEvents();
-  }, [currentDate, calendars, selectedCalendarIds]);
+  }, [currentDate, calendars, selectedCalendarIds, viewMode, selectedSchoolYear]);
 
   const handleCalendarToggle = (calendarId: string) => {
     setSelectedCalendarIds((prev) =>
@@ -96,12 +105,20 @@ export default function PlannerPage() {
     setSelectedCalendarIds([]);
   };
 
-  const handlePreviousWeek = () => {
-    setCurrentDate(getPreviousWeek(currentDate));
+  const handlePrevious = () => {
+    if (viewMode === 'week') {
+      setCurrentDate(getPreviousWeek(currentDate));
+    } else {
+      setCurrentDate(getPreviousMonth(currentDate));
+    }
   };
 
-  const handleNextWeek = () => {
-    setCurrentDate(getNextWeek(currentDate));
+  const handleNext = () => {
+    if (viewMode === 'week') {
+      setCurrentDate(getNextWeek(currentDate));
+    } else {
+      setCurrentDate(getNextMonth(currentDate));
+    }
   };
 
   const handleDateSelect = (date: Date) => {
@@ -114,11 +131,21 @@ export default function PlannerPage() {
       return;
     }
 
-    const startDate = weekDates[0].toISOString();
-    const endDate = weekDates[weekDates.length - 1].toISOString();
+    let startDate: string;
+    let endDate: string;
+
+    if (viewMode === 'week') {
+      const weekDates = getWeekDates(currentDate, workweekOnly);
+      startDate = weekDates[0].toISOString();
+      endDate = weekDates[weekDates.length - 1].toISOString();
+    } else {
+      const monthDates = getMonthDates(currentDate, workweekOnly);
+      startDate = monthDates[0].toISOString();
+      endDate = monthDates[monthDates.length - 1].toISOString();
+    }
     
     const params = new URLSearchParams({
-      school_year: '2026/2027',
+      school_year: selectedSchoolYear,
       calendar_ids: selectedCalendarIds.join(','),
       start_date: startDate,
       end_date: endDate,
@@ -134,7 +161,7 @@ export default function PlannerPage() {
     }
 
     const params = new URLSearchParams({
-      school_year: '2026/2027',
+      school_year: selectedSchoolYear,
       calendar_ids: selectedCalendarIds.join(','),
     });
 
@@ -160,74 +187,91 @@ export default function PlannerPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">
-          Jaarplanner 2026/2027
-        </h1>
-        <div className="flex gap-2">
-          {/* Week/Month Toggle */}
-          <div className="flex items-center bg-gray-200 rounded-lg p-1">
-            <button
-              onClick={() => setViewMode('week')}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                viewMode === 'week'
-                  ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-800'
-              }`}
+    <div className="container mx-auto px-4 py-8 max-w-7xl">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-8 gap-6">
+        <div>
+          <h1 className="text-3xl font-bold text-dacapo-dark-900 mb-2">
+            Jaarplanner {selectedSchoolYear}
+          </h1>
+          <p className="text-gray-500">
+            Beheer en bekijk alle schoolactiviteiten in één overzicht.
+          </p>
+        </div>
+        
+        <div className="flex flex-wrap gap-3">
+          {/* View Toggles Container */}
+          <div className="flex bg-white rounded-lg p-1 shadow-sm border border-gray-200">
+            {/* Week/Month Toggle */}
+            <div className="flex items-center border-r border-gray-200 pr-1 mr-1">
+              <button
+                onClick={() => setViewMode('week')}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                  viewMode === 'week'
+                    ? 'bg-dacapo-blue-50 text-dacapo-blue-600'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                }`}
+              >
+                Week
+              </button>
+              <button
+                onClick={() => setViewMode('month')}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                  viewMode === 'month'
+                    ? 'bg-dacapo-blue-50 text-dacapo-blue-600'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                }`}
+              >
+                Maand
+              </button>
+            </div>
+            
+            {/* Workweek/Full Week Toggle */}
+            <div className="flex items-center pl-1">
+              <button
+                onClick={() => setWorkweekOnly(true)}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                  workweekOnly
+                    ? 'bg-dacapo-green-50 text-dacapo-green-600'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                }`}
+              >
+                Ma-Vr
+              </button>
+              <button
+                onClick={() => setWorkweekOnly(false)}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                  !workweekOnly
+                    ? 'bg-dacapo-green-50 text-dacapo-green-600'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                }`}
+              >
+                Ma-Zo
+              </button>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex gap-2">
+            <button 
+              onClick={handleSubscribeCalendar}
+              className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 text-sm font-medium flex items-center gap-2 shadow-sm"
+              title="Download kalender voor Outlook"
             >
-              Week
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-dacapo-blue-600" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+              <span className="hidden sm:inline">Outlook</span>
             </button>
-            <button
-              onClick={() => setViewMode('month')}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                viewMode === 'month'
-                  ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-800'
-              }`}
+            <button 
+              onClick={handleExportView}
+              className="px-4 py-2 bg-dacapo-green-600 text-white rounded-lg hover:bg-dacapo-green-500 transition-all duration-200 text-sm font-medium shadow-sm flex items-center gap-2"
             >
-              Maand (4 weken)
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              <span className="hidden sm:inline">Exporteer</span>
             </button>
           </div>
-          {/* Workweek/Full Week Toggle */}
-          <div className="flex items-center bg-gray-200 rounded-lg p-1">
-            <button
-              onClick={() => setWorkweekOnly(true)}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                workweekOnly
-                  ? 'bg-white text-green-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-800'
-              }`}
-            >
-              Ma-Vr
-            </button>
-            <button
-              onClick={() => setWorkweekOnly(false)}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                !workweekOnly
-                  ? 'bg-white text-green-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-800'
-              }`}
-            >
-              Ma-Zo
-            </button>
-          </div>
-          <button 
-            onClick={handleSubscribeCalendar}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-sm flex items-center gap-2"
-            title="Download kalender voor Outlook"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
-            </svg>
-            Download voor Outlook
-          </button>
-          <button 
-            onClick={handleExportView}
-            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors text-sm"
-          >
-            Exporteer huidige view naar .ics
-          </button>
         </div>
       </div>
 
@@ -237,43 +281,64 @@ export default function PlannerPage() {
         onCalendarToggle={handleCalendarToggle}
         onSelectAll={handleSelectAll}
         onDeselectAll={handleDeselectAll}
+        selectedSchoolYear={selectedSchoolYear}
+        onSchoolYearChange={setSelectedSchoolYear}
       />
 
-      <WeekNavigation
-        currentDate={currentDate}
-        onPreviousWeek={handlePreviousWeek}
-        onNextWeek={handleNextWeek}
-        onDateSelect={handleDateSelect}
-      />
+      <div className="mb-6 flex items-center justify-between bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+        <div className="flex items-center gap-6">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handlePrevious}
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-600 hover:text-dacapo-blue-600"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <button
+              onClick={handleNext}
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-600 hover:text-dacapo-blue-600"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+          <h2 className="text-xl font-bold text-dacapo-dark-900">
+            {viewMode === 'week'
+              ? `${formatWeekNumber(currentDate)} - ${getWeekDates(currentDate)[0] ? getWeekDates(currentDate)[0].toLocaleDateString('nl-NL', { month: 'long', year: 'numeric' }) : ''}`
+              : getMonthName(currentDate)
+            }
+          </h2>
+        </div>
+        <button
+          onClick={() => setCurrentDate(new Date())}
+          className="px-4 py-2 text-sm font-medium text-dacapo-blue-600 bg-dacapo-blue-50 hover:bg-dacapo-blue-100 rounded-lg transition-colors"
+        >
+          Vandaag
+        </button>
+      </div>
 
       {loading ? (
-        <div className="bg-white p-8 rounded-lg shadow-md text-center">
-          <p className="text-gray-600">Activiteiten laden...</p>
+        <div className="bg-white p-12 rounded-xl shadow-sm border border-gray-100 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-dacapo-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-500">Activiteiten laden...</p>
         </div>
       ) : viewMode === 'week' ? (
         <WeekView
-          weekDates={weekDates}
+          weekDates={getWeekDates(currentDate, workweekOnly)}
           events={events}
           selectedCalendarIds={selectedCalendarIds}
         />
       ) : (
-        <div className="space-y-6">
-          {[0, 1, 2, 3].map((weekOffset) => {
-            const weekStartDate = new Date(currentDate);
-            weekStartDate.setDate(weekStartDate.getDate() + (weekOffset * 7));
-            const offsetWeekDates = getWeekDates(weekStartDate, workweekOnly);
-            
-            return (
-              <div key={weekOffset} className="border-t-2 border-gray-300 pt-4">
-                <WeekView
-                  weekDates={offsetWeekDates}
-                  events={events}
-                  selectedCalendarIds={selectedCalendarIds}
-                />
-              </div>
-            );
-          })}
-        </div>
+        <MonthView
+          monthDates={getMonthDates(currentDate, workweekOnly)}
+          currentMonth={currentDate}
+          events={events}
+          selectedCalendarIds={selectedCalendarIds}
+          workweekOnly={workweekOnly}
+        />
       )}
 
       {/* Subscribe Modal */}

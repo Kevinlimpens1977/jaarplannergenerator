@@ -181,6 +181,15 @@ export async function updateEvent(
 }
 
 export async function deleteEvent(id: string) {
+  // First delete related event_calendars entries
+  const { error: relError } = await supabase
+    .from('event_calendars')
+    .delete()
+    .eq('event_id', id);
+
+  if (relError) throw relError;
+
+  // Then delete the event itself
   const { error } = await supabase
     .from('events')
     .delete()
@@ -194,7 +203,7 @@ export async function approveEvent(eventId: string, approverId: string, comment?
   const { data: event, error: eventError } = await supabase
     .from('events')
     .update({
-      status: 'goedgekeurd' as any,
+      status: 'goedgekeurd',
       approved_by: approverId
     } as any)
     .eq('id', eventId)
@@ -223,7 +232,7 @@ export async function rejectEvent(eventId: string, approverId: string, comment?:
   const { data: event, error: eventError } = await supabase
     .from('events')
     .update({
-      status: 'afgewezen' as any,
+      status: 'afgewezen',
       approved_by: approverId
     } as any)
     .eq('id', eventId)

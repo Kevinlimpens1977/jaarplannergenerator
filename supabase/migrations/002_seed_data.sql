@@ -3,13 +3,13 @@
 
 -- Insert default calendars
 INSERT INTO calendars (name, code, color) VALUES
-  ('DaCapo Algemeen 26/27', 'ALG', '#3B82F6'),                    -- Blauw
-  ('BB/KB Onderbouw 26/27', 'BBKB_OB', '#10B981'),                -- Groen
-  ('GT Onderbouw 26/27', 'GT_OB', '#F59E0B'),                     -- Oranje
-  ('BB/KB Bovenbouw MLN 26/27', 'BBKB_BB_MLN', '#8B5CF6'),        -- Paars
-  ('BB/BK Bovenbouw HVK 26/27', 'BBBK_BB_HVK', '#EF4444'),        -- Rood
-  ('GT Bovenbouw 26/27', 'GT_BB', '#EC4899'),                     -- Roze
-  ('Kwaliteitskalender 26/27', 'KWAL', '#06B6D4');                -- Cyaan
+  ('DaCapo Algemeen', 'ALG', '#3B82F6'),                    -- Blauw
+  ('BB/KB Onderbouw', 'BBKB_OB', '#10B981'),                -- Groen
+  ('GT Onderbouw', 'GT_OB', '#F59E0B'),                     -- Oranje
+  ('BB/KB Bovenbouw MLN', 'BBKB_BB_MLN', '#8B5CF6'),        -- Paars
+  ('BB/BK Bovenbouw HVK', 'BBBK_BB_HVK', '#EF4444'),        -- Rood
+  ('GT Bovenbouw', 'GT_BB', '#EC4899'),                     -- Roze
+  ('Kwaliteitskalender', 'KWAL', '#06B6D4');                -- Cyaan
 
 -- Insert a test admin user (you can modify this or remove it later)
 -- Password hash is not included here - use Supabase Auth UI or API to create real users
@@ -19,7 +19,7 @@ INSERT INTO users (name, email, role, department) VALUES
   ('Maria Teamleider', 'maria@dacapo.nl', 'approver', 'GT Bovenbouw');
 
 -- Insert some example events for testing (optional)
--- These are example events for the 2026/2027 school year
+-- These are example events for the 2025/2026 and 2026/2027 school years
 
 DO $$
 DECLARE
@@ -34,11 +34,43 @@ BEGIN
   -- Get admin user ID
   SELECT id INTO admin_user_id FROM users WHERE email = 'admin@dacapo.nl';
 
-  -- Insert example events
+  -- Insert example events for 2025/2026
   INSERT INTO events (title, description, school_year, start_datetime, end_datetime, all_day, category, location, audience, status, created_by, approved_by)
   VALUES
     (
-      'Herfstvakantie',
+      'Herfstvakantie 2025',
+      'Herfstvakantie voor alle leerlingen',
+      '2025/2026',
+      '2025-10-13 00:00:00+02',
+      '2025-10-19 23:59:59+02',
+      true,
+      'vakantie',
+      NULL,
+      'Alle leerlingen',
+      'goedgekeurd',
+      admin_user_id,
+      admin_user_id
+    ),
+    (
+      'Kerstvakantie 2025',
+      'Kerstvakantie voor alle leerlingen',
+      '2025/2026',
+      '2025-12-22 00:00:00+01',
+      '2026-01-04 23:59:59+01',
+      true,
+      'vakantie',
+      NULL,
+      'Alle leerlingen',
+      'goedgekeurd',
+      admin_user_id,
+      admin_user_id
+    );
+
+  -- Insert example events for 2026/2027
+  INSERT INTO events (title, description, school_year, start_datetime, end_datetime, all_day, category, location, audience, status, created_by, approved_by)
+  VALUES
+    (
+      'Herfstvakantie 2026',
       'Herfstvakantie voor alle leerlingen',
       '2026/2027',
       '2026-10-19 00:00:00+02',
@@ -66,7 +98,7 @@ BEGIN
       admin_user_id
     ),
     (
-      'Kerstvakantie',
+      'Kerstvakantie 2026',
       'Kerstvakantie voor alle leerlingen',
       '2026/2027',
       '2026-12-21 00:00:00+01',
@@ -99,7 +131,7 @@ BEGIN
   INSERT INTO event_calendars (event_id, calendar_id)
   SELECT e.id, alg_calendar_id
   FROM events e
-  WHERE e.title IN ('Herfstvakantie', 'Kerstvakantie', 'Open Dag');
+  WHERE e.title LIKE 'Herfstvakantie%' OR e.title LIKE 'Kerstvakantie%' OR e.title = 'Open Dag';
 
   -- Toetsweek -> BB/KB Onderbouw
   INSERT INTO event_calendars (event_id, calendar_id)

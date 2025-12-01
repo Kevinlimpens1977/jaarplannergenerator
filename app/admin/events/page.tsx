@@ -15,7 +15,7 @@ export default function AdminEventsPage() {
   const [calendars, setCalendars] = useState<Calendar[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedSchoolYear, setSelectedSchoolYear] = useState('2026/2027');
+  const [selectedSchoolYear, setSelectedSchoolYear] = useState('2025/2026');
   const [selectedCalendarIds, setSelectedCalendarIds] = useState<string[]>([]);
   const [deleteInProgress, setDeleteInProgress] = useState<string | null>(null);
   
@@ -204,6 +204,7 @@ export default function AdminEventsPage() {
             onChange={(e) => setSelectedSchoolYear(e.target.value)}
             className="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
+            <option value="2025/2026">2025/2026</option>
             <option value="2026/2027">2026/2027</option>
             <option value="2027/2028">2027/2028</option>
           </select>

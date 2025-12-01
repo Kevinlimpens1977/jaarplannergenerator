@@ -1,9 +1,9 @@
-# DaCapo Jaarplanner 26/27 – Product Requirements Document (PRD)
+# DaCapo Jaarplanner – Product Requirements Document (PRD)
 
 ## 1. Overzicht
 
-De DaCapo Jaarplanner 26/27 is een interne webapp voor medewerkers van DaCapo College.  
-De app vervangt de huidige Excel-jaarplanner en maakt het mogelijk om:
+De DaCapo Jaarplanner is een interne webapp voor medewerkers van DaCapo College.
+De app vervangt de huidige Excel-jaarplanner, startend vanaf schooljaar 2025/2026, en maakt het mogelijk om:
 
 - Eén centrale digitale jaarplanner te tonen.
 - Meerdere parallelle "deelplanners" (kalenders) te beheren:
@@ -38,7 +38,8 @@ De app vervangt de huidige Excel-jaarplanner en maakt het mogelijk om:
 ## 3. Belangrijkste Use Cases
 
 1. **Jaarplanner bekijken**
-   - Gebruiker logt in en ziet de jaarplanner voor schooljaar 2026/2027.
+   - Gebruiker logt in en ziet standaard het huidige schooljaar (bijv. 2025/2026).
+   - Kan wisselen tussen schooljaren (2025/2026, 2026/2027, 2027/2028).
    - Kan week voor week bladeren.
    - Kan filteren op kalenders en type activiteit.
 
@@ -94,7 +95,7 @@ De app vervangt de huidige Excel-jaarplanner en maakt het mogelijk om:
 ### 4.2 Filters
 
 - Filterbalk boven de planner met:
-  - Schooljaar (start met 2026/2027).
+  - Schooljaar selectie (2025/2026, 2026/2027, 2027/2028).
   - Een lijst met kalenders (checkboxen):
     - DaCapo Algemeen
     - BB/KB Onderbouw
@@ -200,7 +201,7 @@ De app vervangt de huidige Excel-jaarplanner en maakt het mogelijk om:
 
 ### 7.2 `/planner`
 
-- Standaardweergave van jaarplanner 2026/2027.
+- Standaardweergave van het huidige schooljaar (2025/2026).
 - Filters en weeknavigatie.
 - Dagkolommen met activiteiten als gekleurde chips per kalender.
 - Klik op activiteit → naar detail.
@@ -277,4 +278,4 @@ Dit PRD beschrijft een centrale jaarplanner-webapp met:
 - Exportmogelijkheden naar Outlook via `.ics`.
 - Een admin-dashboard voor beheer en kwaliteitsbewaking.
 
-De implementatie in Next.js + Supabase moet deze functionaliteit robuust en uitbreidbaar neerzetten, zodat toekomstige schooljaren (27/28, 28/29, etc.) eenvoudig kunnen worden toegevoegd.
+De implementatie in Next.js + Supabase moet deze functionaliteit robuust en uitbreidbaar neerzetten, met ondersteuning voor schooljaren 25/26, 26/27 en 27/28, en zodat toekomstige jaren eenvoudig kunnen worden toegevoegd.

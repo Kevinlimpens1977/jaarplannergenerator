@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import Image from 'next/image';
 
 export default function Navigation() {
   const pathname = usePathname();
@@ -13,22 +14,39 @@ export default function Navigation() {
   ];
 
   return (
-    <nav className="bg-blue-600 text-white shadow-lg">
+    <nav className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-50">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          <div className="flex items-center space-x-8">
-            <Link href="/planner" className="text-xl font-bold">
-              DaCapo Jaarplanner 26/27
+        <div className="flex items-center justify-between h-20">
+          <div className="flex items-center gap-8">
+            <Link href="/planner" className="flex items-center gap-3 group">
+              <div className="relative w-12 h-12 transition-transform group-hover:scale-105">
+                <Image 
+                  src="https://iyyxtrwcluuhorwcdzbg.supabase.co/storage/v1/object/public/app-images/jaarplanner2.png"
+                  alt="Paco Mascotte"
+                  fill
+                  className="object-contain"
+                  priority
+                />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-xl font-bold text-dacapo-dark-900 leading-tight">
+                  DaCapo
+                </span>
+                <span className="text-sm font-medium text-dacapo-orange-500 leading-tight">
+                  Jaarplanner
+                </span>
+              </div>
             </Link>
-            <div className="flex space-x-4">
+            
+            <div className="hidden md:flex items-center space-x-1 bg-gray-100 p-1 rounded-lg">
               {navItems.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
                     pathname.startsWith(item.href)
-                      ? 'bg-blue-700'
-                      : 'hover:bg-blue-500'
+                      ? 'bg-white text-dacapo-blue-600 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200/50'
                   }`}
                 >
                   {item.label}
@@ -36,10 +54,35 @@ export default function Navigation() {
               ))}
             </div>
           </div>
-          <div className="text-sm">
-            <span className="opacity-75">Ingelogd als:</span>{' '}
-            <span className="font-medium">Admin</span>
+
+          <div className="flex items-center gap-4">
+            <div className="hidden md:flex flex-col items-end text-sm">
+              <span className="text-gray-500 text-xs">Ingelogd als</span>
+              <span className="font-semibold text-dacapo-dark-900">Admin</span>
+            </div>
+            <div className="w-10 h-10 rounded-full bg-dacapo-blue-100 flex items-center justify-center text-dacapo-blue-600 font-bold border-2 border-white shadow-sm">
+              A
+            </div>
           </div>
+        </div>
+      </div>
+      
+      {/* Mobile Navigation */}
+      <div className="md:hidden border-t border-gray-100 bg-gray-50">
+        <div className="flex justify-around p-2">
+          {navItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`flex-1 text-center py-2 text-sm font-medium rounded-md ${
+                pathname.startsWith(item.href)
+                  ? 'text-dacapo-blue-600 bg-white shadow-sm'
+                  : 'text-gray-600'
+              }`}
+            >
+              {item.label}
+            </Link>
+          ))}
         </div>
       </div>
     </nav>

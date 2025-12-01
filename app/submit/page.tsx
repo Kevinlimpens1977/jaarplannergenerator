@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { getCalendars, createEvent, getCurrentUser } from '@/lib/supabase/queries';
 import type { Calendar, User } from '@/lib/types/database';
+import { getCurrentSchoolYear, getNextSchoolYear } from '@/lib/utils/dateUtils';
 
 export default function SubmitPage() {
   const router = useRouter();
@@ -12,10 +13,13 @@ export default function SubmitPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const currentSchoolYear = getCurrentSchoolYear();
+  const nextSchoolYear = getNextSchoolYear(currentSchoolYear);
+
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    school_year: '2026/2027',
+    school_year: currentSchoolYear,
     start_date: '',
     end_date: '',
     start_time: '',
@@ -200,8 +204,8 @@ export default function SubmitPage() {
             onChange={handleInputChange}
             className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            <option value="2026/2027">2026/2027</option>
-            <option value="2027/2028">2027/2028</option>
+            <option value={currentSchoolYear}>{currentSchoolYear}</option>
+            <option value={nextSchoolYear}>{nextSchoolYear}</option>
           </select>
         </div>
 
