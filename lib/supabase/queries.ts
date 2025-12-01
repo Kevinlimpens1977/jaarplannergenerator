@@ -4,12 +4,19 @@ import type { Event, EventWithDetails, Calendar, User, PlannerFilters } from '@/
 // ============ CALENDARS ============
 
 export async function getCalendars() {
+  if (!supabase) {
+    throw new Error('Supabase client is not initialized. Check your .env.local file.');
+  }
+  
   const { data, error } = await supabase
     .from('calendars')
     .select('*')
     .order('name');
   
-  if (error) throw error;
+  if (error) {
+    console.error('Error fetching calendars:', error);
+    throw error;
+  }
   return data as Calendar[];
 }
 
@@ -27,6 +34,10 @@ export async function getCalendarByCode(code: string) {
 // ============ EVENTS ============
 
 export async function getEvents(filters?: PlannerFilters & { includeAllStatuses?: boolean }) {
+  if (!supabase) {
+    throw new Error('Supabase client is not initialized. Check your .env.local file.');
+  }
+  
   let query = supabase
     .from('events')
     .select(`
@@ -58,7 +69,10 @@ export async function getEvents(filters?: PlannerFilters & { includeAllStatuses?
 
   const { data, error } = await query;
   
-  if (error) throw error;
+  if (error) {
+    console.error('Error fetching events:', error);
+    throw error;
+  }
   return data as EventWithDetails[];
 }
 

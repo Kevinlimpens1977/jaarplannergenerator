@@ -78,16 +78,20 @@ export function eventToICS(event: EventWithDetails): string {
   return vevent;
 }
 
-// Generate complete ICS file for one or more events
-export function generateICS(events: EventWithDetails[]): string {
+// Generate complete ICS file content
+export function generateICS(
+  events: EventWithDetails[], 
+  calendarName?: string,
+  calendarDescription?: string
+): string {
   let ics = 'BEGIN:VCALENDAR\r\n';
   ics += 'VERSION:2.0\r\n';
   ics += 'PRODID:-//DaCapo College//Jaarplanner 26/27//NL\r\n';
   ics += 'CALSCALE:GREGORIAN\r\n';
   ics += 'METHOD:PUBLISH\r\n';
-  ics += 'X-WR-CALNAME:DaCapo Jaarplanner 26/27\r\n';
+  ics += `X-WR-CALNAME:${escapeICSText(calendarName || 'DaCapo Jaarplanner 26/27')}\r\n`;
   ics += 'X-WR-TIMEZONE:Europe/Amsterdam\r\n';
-  ics += 'X-WR-CALDESC:Jaarplanner voor DaCapo College schooljaar 2026/2027\r\n';
+  ics += `X-WR-CALDESC:${escapeICSText(calendarDescription || 'Jaarplanner voor DaCapo College schooljaar 2026/2027')}\r\n`;
 
   // Add timezone information for Europe/Amsterdam
   ics += 'BEGIN:VTIMEZONE\r\n';

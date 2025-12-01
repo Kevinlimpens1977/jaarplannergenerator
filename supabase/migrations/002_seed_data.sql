@@ -3,13 +3,13 @@
 
 -- Insert default calendars
 INSERT INTO calendars (name, code, color) VALUES
-  ('DaCapo Algemeen', 'ALG', '#3B82F6'),                    -- Blauw
-  ('BB/KB Onderbouw', 'BBKB_OB', '#10B981'),                -- Groen
-  ('GT Onderbouw', 'GT_OB', '#F59E0B'),                     -- Oranje
-  ('BB/KB Bovenbouw MLN', 'BBKB_BB_MLN', '#8B5CF6'),        -- Paars
-  ('BB/BK Bovenbouw HVK', 'BBBK_BB_HVK', '#EF4444'),        -- Rood
-  ('GT Bovenbouw', 'GT_BB', '#EC4899'),                     -- Roze
-  ('Kwaliteitskalender', 'KWAL', '#06B6D4');                -- Cyaan
+  ('DaCapo Algemeen 26/27', 'ALG', '#3B82F6'),                    -- Blauw
+  ('BB/KB Onderbouw 26/27', 'BBKB_OB', '#10B981'),                -- Groen
+  ('GT Onderbouw 26/27', 'GT_OB', '#F59E0B'),                     -- Oranje
+  ('BB/KB Bovenbouw MLN 26/27', 'BBKB_BB_MLN', '#8B5CF6'),        -- Paars
+  ('BB/BK Bovenbouw HVK 26/27', 'BBBK_BB_HVK', '#EF4444'),        -- Rood
+  ('GT Bovenbouw 26/27', 'GT_BB', '#EC4899'),                     -- Roze
+  ('Kwaliteitskalender 26/27', 'KWAL', '#06B6D4');                -- Cyaan
 
 -- Insert a test admin user (you can modify this or remove it later)
 -- Password hash is not included here - use Supabase Auth UI or API to create real users
