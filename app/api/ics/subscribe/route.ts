@@ -3,6 +3,9 @@ import { createClient } from '@supabase/supabase-js';
 import { generateICS } from '@/lib/ics/generator';
 import type { Database } from '@/lib/types/database';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 /**
  * API Route: Subscribe to calendar(s)
  * GET /api/ics/subscribe?calendar_ids=id1,id2,id3&school_year=2026/2027
