@@ -151,8 +151,8 @@ export default function AdminEventsPage() {
   if (loading && calendars.length === 0) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <div className="bg-white p-8 rounded-lg shadow-md text-center">
-          <p className="text-gray-600">Laden...</p>
+        <div className="bg-green-50 p-8 rounded-2xl shadow-sm border border-green-200 text-center">
+          <p className="text-green-700">Laden...</p>
         </div>
       </div>
     );
@@ -161,7 +161,7 @@ export default function AdminEventsPage() {
   if (error) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+        <div className="bg-red-50 border border-red-200 rounded-2xl p-6">
           <h2 className="text-xl font-bold text-red-800 mb-2">Fout</h2>
           <p className="text-red-700">{error}</p>
         </div>
@@ -172,11 +172,11 @@ export default function AdminEventsPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">Alle activiteiten beheren</h1>
+        <h1 className="text-3xl font-bold text-green-900">Alle activiteiten beheren</h1>
         <div className="flex gap-3">
           <button
             onClick={() => setBatchCreateModalOpen(true)}
-            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors flex items-center gap-2"
+            className="px-4 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors flex items-center gap-2 shadow-sm"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -185,7 +185,7 @@ export default function AdminEventsPage() {
           </button>
           <Link
             href="/submit"
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+            className="px-4 py-2 bg-white border border-green-200 text-green-700 rounded-xl hover:bg-green-50 transition-colors shadow-sm"
           >
             + Nieuwe activiteit
           </Link>
@@ -193,16 +193,16 @@ export default function AdminEventsPage() {
       </div>
 
       {/* Filters */}
-      <div className="bg-white p-4 rounded-lg shadow-md mb-6">
+      <div className="bg-green-50 p-4 rounded-2xl shadow-sm border border-green-200 mb-6">
         <div className="mb-4">
-          <label htmlFor="school_year" className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="school_year" className="block text-sm font-medium text-green-900 mb-2">
             Schooljaar:
           </label>
           <select
             id="school_year"
             value={selectedSchoolYear}
             onChange={(e) => setSelectedSchoolYear(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-3 py-2 border border-green-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
           >
             <option value="2025/2026">2025/2026</option>
             <option value="2026/2027">2026/2027</option>
@@ -212,18 +212,18 @@ export default function AdminEventsPage() {
 
         <div>
           <div className="flex items-center justify-between mb-2">
-            <label className="block text-sm font-medium text-gray-700">Kalenders:</label>
+            <label className="block text-sm font-medium text-green-900">Kalenders:</label>
             <div className="flex gap-2">
               <button
                 onClick={handleSelectAllCalendars}
-                className="text-sm text-blue-600 hover:text-blue-800"
+                className="text-sm text-green-700 hover:text-green-900"
               >
                 Alles
               </button>
-              <span className="text-gray-400">|</span>
+              <span className="text-green-300">|</span>
               <button
                 onClick={handleDeselectAllCalendars}
-                className="text-sm text-blue-600 hover:text-blue-800"
+                className="text-sm text-green-700 hover:text-green-900"
               >
                 Niets
               </button>
@@ -236,9 +236,9 @@ export default function AdminEventsPage() {
                   type="checkbox"
                   checked={selectedCalendarIds.includes(calendar.id)}
                   onChange={() => handleCalendarToggle(calendar.id)}
-                  className="w-4 h-4 text-blue-600 rounded"
+                  className="w-4 h-4 text-green-600 rounded focus:ring-green-500 border-green-300"
                 />
-                <span className="text-sm text-gray-700">{calendar.name}</span>
+                <span className="text-sm text-green-900">{calendar.name}</span>
               </label>
             ))}
           </div>
@@ -247,53 +247,53 @@ export default function AdminEventsPage() {
 
       {/* Events lijst */}
       {loading ? (
-        <div className="bg-white p-8 rounded-lg shadow-md text-center">
-          <p className="text-gray-600">Activiteiten laden...</p>
+        <div className="bg-green-50 p-8 rounded-2xl shadow-sm border border-green-200 text-center">
+          <p className="text-green-700">Activiteiten laden...</p>
         </div>
       ) : events.length === 0 ? (
-        <div className="bg-white p-8 rounded-lg shadow-md text-center">
-          <p className="text-gray-600">Geen activiteiten gevonden voor de geselecteerde filters.</p>
+        <div className="bg-green-50 p-8 rounded-2xl shadow-sm border border-green-200 text-center">
+          <p className="text-green-700">Geen activiteiten gevonden voor de geselecteerde filters.</p>
         </div>
       ) : (
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-sm border border-green-200 overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-green-100">
+              <thead className="bg-green-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-green-800 uppercase tracking-wider">
                     Titel
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-green-800 uppercase tracking-wider">
                     Datum
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-green-800 uppercase tracking-wider">
                     Kalenders
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-green-800 uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-green-800 uppercase tracking-wider">
                     Acties
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-white divide-y divide-green-100">
                 {events.map((event) => (
-                  <tr key={event.id} className="hover:bg-gray-50">
+                  <tr key={event.id} className="hover:bg-green-50 transition-colors">
                     <td className="px-6 py-4">
                       <Link
                         href={`/events/${event.id}`}
-                        className="text-blue-600 hover:underline font-medium"
+                        className="text-green-700 hover:underline font-medium"
                       >
                         {event.title}
                       </Link>
                       {event.category && (
-                        <span className="block text-xs text-gray-500 capitalize mt-1">
+                        <span className="block text-xs text-green-600 capitalize mt-1">
                           {event.category}
                         </span>
                       )}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-700">
+                    <td className="px-6 py-4 text-sm text-green-800">
                       {format(parseISO(event.start_datetime), 'd MMM yyyy', { locale: nl })}
                     </td>
                     <td className="px-6 py-4">
@@ -321,13 +321,13 @@ export default function AdminEventsPage() {
                       <div className="flex gap-2">
                         <button
                           onClick={() => handleEdit(event)}
-                          className="text-blue-600 hover:text-blue-800 text-sm"
+                          className="text-green-600 hover:text-green-800 text-sm"
                         >
                           Bewerken
                         </button>
                         <button
                           onClick={() => handleCopy(event)}
-                          className="text-purple-600 hover:text-purple-800 text-sm"
+                          className="text-green-600 hover:text-green-800 text-sm"
                         >
                           Kopiëren
                         </button>

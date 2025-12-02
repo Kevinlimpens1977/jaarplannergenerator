@@ -41,14 +41,14 @@ export default function MonthView({ monthDates, currentMonth, events, selectedCa
 
   if (selectedCalendarIds.length === 0) {
     return (
-      <div className="bg-white p-12 rounded-xl shadow-sm border border-gray-100 text-center">
-        <div className="text-dacapo-blue-100 mb-4">
+      <div className="bg-green-50 p-12 rounded-2xl shadow-sm border border-green-200 text-center">
+        <div className="text-green-200 mb-4">
           <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
         </div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">Geen kalenders geselecteerd</h3>
-        <p className="text-gray-500">
+        <h3 className="text-lg font-semibold text-green-900 mb-2">Geen kalenders geselecteerd</h3>
+        <p className="text-green-700">
           Selecteer minimaal één kalender in de filters om activiteiten te zien.
         </p>
       </div>
@@ -58,17 +58,17 @@ export default function MonthView({ monthDates, currentMonth, events, selectedCa
   const gridCols = workweekOnly ? 'grid-cols-1 sm:grid-cols-5' : 'grid-cols-1 sm:grid-cols-7';
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+    <div className="bg-white rounded-2xl shadow-sm border border-green-200 overflow-hidden">
       {/* Header with day names - Hidden on mobile */}
-      <div className={`hidden sm:grid ${gridCols} bg-gray-50 border-b border-gray-200`}>
+      <div className={`hidden sm:grid ${gridCols} bg-green-50 border-b border-green-200`}>
         {monthDates.slice(0, workweekOnly ? 5 : 7).map((date) => (
-          <div key={date.toISOString()} className="p-3 text-center font-semibold text-sm text-gray-600 uppercase tracking-wider">
+          <div key={date.toISOString()} className="p-3 text-center font-semibold text-sm text-green-700 uppercase tracking-wider">
             {format(date, 'EEEE', { locale: nl })}
           </div>
         ))}
       </div>
 
-      <div className={`grid ${gridCols} gap-px bg-gray-200`}>
+      <div className={`grid ${gridCols} gap-px bg-green-200`}>
         {monthDates.map((date) => {
           const dayEvents = getEventsForDay(date);
           const isToday = isWithinInterval(new Date(), {
@@ -78,8 +78,8 @@ export default function MonthView({ monthDates, currentMonth, events, selectedCa
           const isCurrentMonth = isSameMonth(date, currentMonth);
 
           return (
-            <div 
-              key={date.toISOString()} 
+            <div
+              key={date.toISOString()}
               className={`bg-white min-h-[100px] sm:min-h-[140px] flex flex-col ${!isCurrentMonth ? 'bg-gray-50/50' : ''}`}
             >
               <div className="flex items-center justify-between p-2">
@@ -89,10 +89,10 @@ export default function MonthView({ monthDates, currentMonth, events, selectedCa
                 </span>
                 <div
                   className={`text-sm w-7 h-7 flex items-center justify-center rounded-full ${
-                    isToday 
-                      ? 'bg-dacapo-blue-600 text-white font-bold shadow-sm' 
-                      : !isCurrentMonth 
-                        ? 'text-gray-400' 
+                    isToday
+                      ? 'bg-green-600 text-white font-bold shadow-sm'
+                      : !isCurrentMonth
+                        ? 'text-gray-400'
                         : 'text-gray-700 font-medium'
                   }`}
                 >

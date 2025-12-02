@@ -19,6 +19,7 @@ function formatICSDate(date: Date, allDay: boolean = false): string {
 
 // Escape special characters in ICS content
 function escapeICSText(text: string): string {
+  if (!text) return '';
   return text
     .replace(/\\/g, '\\\\')
     .replace(/;/g, '\\;')
@@ -54,7 +55,10 @@ export function eventToICS(event: EventWithDetails): string {
   
   if (event.all_day) {
     vevent += `DTSTART;VALUE=DATE:${formatICSDate(startDate, true)}\r\n`;
-    vevent += `DTEND;VALUE=DATE:${formatICSDate(endDate, true)}\r\n`;
+    // ICS end date for all-day events is exclusive (next day)
+    const nextDay = new Date(endDate);
+    nextDay.setDate(nextDay.getDate() + 1);
+    vevent += `DTEND;VALUE=DATE:${formatICSDate(nextDay, true)}\r\n`;
   } else {
     vevent += `DTSTART:${formatICSDate(startDate)}\r\n`;
     vevent += `DTEND:${formatICSDate(endDate)}\r\n`;
@@ -62,8 +66,16 @@ export function eventToICS(event: EventWithDetails): string {
 
   vevent += `SUMMARY:${escapeICSText(event.title)}\r\n`;
 
-  if (event.description) {
-    vevent += `DESCRIPTION:${escapeICSText(event.description)}\r\n`;
+  let description = event.description || '';
+  if (calendarNames) {
+    description += `\n\nKalenders: ${calendarNames}`;
+  }
+  if (event.audience) {
+    description += `\nDoelgroep: ${event.audience}`;
+  }
+  
+  if (description) {
+    vevent += `DESCRIPTION:${escapeICSText(description)}\r\n`;
   }
 
   if (event.location) {
@@ -72,7 +84,8 @@ export function eventToICS(event: EventWithDetails): string {
 
   vevent += `CATEGORIES:${escapeICSText(categories)}\r\n`;
   vevent += `STATUS:CONFIRMED\r\n`;
-  vevent += `TRANSP:OPAQUE\r\n`;
+  vevent += `TRANSP:${event.all_day ? 'TRANSPARENT' : 'OPAQUE'}\r\n`;
+  vevent += `ORGANIZER;CN=DaCapo College:mailto:noreply@dacapo-college.nl\r\n`;
   vevent += `END:VEVENT\r\n`;
 
   return vevent;
@@ -89,9 +102,12 @@ export function generateICS(
   ics += 'PRODID:-//DaCapo College//Jaarplanner 26/27//NL\r\n';
   ics += 'CALSCALE:GREGORIAN\r\n';
   ics += 'METHOD:PUBLISH\r\n';
-  ics += `X-WR-CALNAME:${escapeICSText(calendarName || 'DaCapo Jaarplanner 26/27')}\r\n`;
+  ics += `X-WR-CALNAME:${escapeICSText(calendarName || 'DaCapo Jaarplanner')}\r\n`;
   ics += 'X-WR-TIMEZONE:Europe/Amsterdam\r\n';
-  ics += `X-WR-CALDESC:${escapeICSText(calendarDescription || 'Jaarplanner voor DaCapo College schooljaar 2026/2027')}\r\n`;
+  
+  if (calendarDescription) {
+    ics += `X-WR-CALDESC:${escapeICSText(calendarDescription)}\r\n`;
+  }
 
   // Add timezone information for Europe/Amsterdam
   ics += 'BEGIN:VTIMEZONE\r\n';

@@ -89,6 +89,16 @@ export default function PlannerPage() {
     loadEvents();
   }, [currentDate, calendars, selectedCalendarIds, viewMode, selectedSchoolYear]);
 
+  const handleSchoolYearChange = (year: string) => {
+    setSelectedSchoolYear(year);
+    const startYear = parseInt(year.split('/')[0]);
+    if (!isNaN(startYear)) {
+      // Set to August 1st of the start year
+      // Month is 0-indexed, so 7 is August
+      setCurrentDate(new Date(startYear, 7, 1));
+    }
+  };
+
   const handleCalendarToggle = (calendarId: string) => {
     setSelectedCalendarIds((prev) =>
       prev.includes(calendarId)
@@ -190,7 +200,7 @@ export default function PlannerPage() {
     <div className="container mx-auto px-4 py-8 max-w-7xl">
       <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-8 gap-6">
         <div>
-          <h1 className="text-3xl font-bold text-dacapo-dark-900 mb-2">
+          <h1 className="text-3xl font-bold text-green-900 mb-2">
             Jaarplanner {selectedSchoolYear}
           </h1>
           <p className="text-gray-500">
@@ -200,25 +210,25 @@ export default function PlannerPage() {
         
         <div className="flex flex-wrap gap-3">
           {/* View Toggles Container */}
-          <div className="flex bg-white rounded-lg p-1 shadow-sm border border-gray-200">
+          <div className="flex bg-green-50 rounded-2xl p-1 shadow-sm border border-green-200">
             {/* Week/Month Toggle */}
-            <div className="flex items-center border-r border-gray-200 pr-1 mr-1">
+            <div className="flex items-center border-r border-green-200 pr-1 mr-1">
               <button
                 onClick={() => setViewMode('week')}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
                   viewMode === 'week'
-                    ? 'bg-dacapo-blue-50 text-dacapo-blue-600'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                    ? 'bg-white text-green-700 shadow-sm'
+                    : 'text-green-700 hover:text-green-900 hover:bg-green-100'
                 }`}
               >
                 Week
               </button>
               <button
                 onClick={() => setViewMode('month')}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
                   viewMode === 'month'
-                    ? 'bg-dacapo-blue-50 text-dacapo-blue-600'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                    ? 'bg-white text-green-700 shadow-sm'
+                    : 'text-green-700 hover:text-green-900 hover:bg-green-100'
                 }`}
               >
                 Maand
@@ -229,20 +239,20 @@ export default function PlannerPage() {
             <div className="flex items-center pl-1">
               <button
                 onClick={() => setWorkweekOnly(true)}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
                   workweekOnly
-                    ? 'bg-dacapo-green-50 text-dacapo-green-600'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                    ? 'bg-white text-green-700 shadow-sm'
+                    : 'text-green-700 hover:text-green-900 hover:bg-green-100'
                 }`}
               >
                 Ma-Vr
               </button>
               <button
                 onClick={() => setWorkweekOnly(false)}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
                   !workweekOnly
-                    ? 'bg-dacapo-green-50 text-dacapo-green-600'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                    ? 'bg-white text-green-700 shadow-sm'
+                    : 'text-green-700 hover:text-green-900 hover:bg-green-100'
                 }`}
               >
                 Ma-Zo
@@ -252,19 +262,19 @@ export default function PlannerPage() {
 
           {/* Action Buttons */}
           <div className="flex gap-2">
-            <button 
+            <button
               onClick={handleSubscribeCalendar}
-              className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 text-sm font-medium flex items-center gap-2 shadow-sm"
+              className="px-4 py-2 bg-green-50 border border-green-200 text-green-700 rounded-2xl hover:bg-green-100 hover:border-green-300 transition-all duration-200 text-sm font-medium flex items-center gap-2 shadow-sm"
               title="Download kalender voor Outlook"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-dacapo-blue-600" viewBox="0 0 20 20" fill="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-600" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
               </svg>
               <span className="hidden sm:inline">Outlook</span>
             </button>
-            <button 
+            <button
               onClick={handleExportView}
-              className="px-4 py-2 bg-dacapo-green-600 text-white rounded-lg hover:bg-dacapo-green-500 transition-all duration-200 text-sm font-medium shadow-sm flex items-center gap-2"
+              className="px-4 py-2 bg-green-600 text-white rounded-2xl hover:bg-green-500 transition-all duration-200 text-sm font-medium shadow-sm flex items-center gap-2"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -282,15 +292,15 @@ export default function PlannerPage() {
         onSelectAll={handleSelectAll}
         onDeselectAll={handleDeselectAll}
         selectedSchoolYear={selectedSchoolYear}
-        onSchoolYearChange={setSelectedSchoolYear}
+        onSchoolYearChange={handleSchoolYearChange}
       />
 
-      <div className="mb-6 flex items-center justify-between bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+      <div className="mb-6 flex items-center justify-between bg-green-50 p-4 rounded-2xl shadow-sm border border-green-200">
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-2">
             <button
               onClick={handlePrevious}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-600 hover:text-dacapo-blue-600"
+              className="p-2 hover:bg-green-100 rounded-full transition-colors text-green-700 hover:text-green-900"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -298,14 +308,14 @@ export default function PlannerPage() {
             </button>
             <button
               onClick={handleNext}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-600 hover:text-dacapo-blue-600"
+              className="p-2 hover:bg-green-100 rounded-full transition-colors text-green-700 hover:text-green-900"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </button>
           </div>
-          <h2 className="text-xl font-bold text-dacapo-dark-900">
+          <h2 className="text-xl font-bold text-green-900">
             {viewMode === 'week'
               ? `${formatWeekNumber(currentDate)} - ${getWeekDates(currentDate)[0] ? getWeekDates(currentDate)[0].toLocaleDateString('nl-NL', { month: 'long', year: 'numeric' }) : ''}`
               : getMonthName(currentDate)
@@ -314,16 +324,16 @@ export default function PlannerPage() {
         </div>
         <button
           onClick={() => setCurrentDate(new Date())}
-          className="px-4 py-2 text-sm font-medium text-dacapo-blue-600 bg-dacapo-blue-50 hover:bg-dacapo-blue-100 rounded-lg transition-colors"
+          className="px-4 py-2 text-sm font-medium text-green-700 bg-white hover:bg-green-100 rounded-xl transition-colors shadow-sm"
         >
           Vandaag
         </button>
       </div>
 
       {loading ? (
-        <div className="bg-white p-12 rounded-xl shadow-sm border border-gray-100 text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-dacapo-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-500">Activiteiten laden...</p>
+        <div className="bg-green-50 p-12 rounded-2xl shadow-sm border border-green-200 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
+          <p className="text-green-700">Activiteiten laden...</p>
         </div>
       ) : viewMode === 'week' ? (
         <WeekView

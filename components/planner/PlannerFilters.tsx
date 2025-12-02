@@ -27,16 +27,31 @@ export default function PlannerFilters({
 
   const schoolYears = ['2025/2026', '2026/2027', '2027/2028'];
 
+  const getShortSchoolYear = (year: string) => {
+    const parts = year.split('/');
+    if (parts.length === 2) {
+      return `${parts[0].slice(2)}/${parts[1].slice(2)}`;
+    }
+    return '';
+  };
+
+  const shortYear = getShortSchoolYear(selectedSchoolYear);
+
+  // Helper to strip existing year suffix (e.g. " 26/27") from calendar name
+  const getBaseCalendarName = (name: string) => {
+    return name.replace(/\s\d{2}\/\d{2}$/, '');
+  };
+
   return (
-    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8">
+    <div className="bg-green-50 p-6 rounded-2xl shadow-sm border border-green-200 mb-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
         <div className="flex items-center gap-4">
-          <h2 className="text-lg font-bold text-dacapo-dark-900">Filters</h2>
+          <h2 className="text-lg font-bold text-green-900">Filters</h2>
           <div className="relative">
             <select
               value={selectedSchoolYear}
               onChange={(e) => onSchoolYearChange(e.target.value)}
-              className="appearance-none pl-4 pr-10 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-dacapo-blue-500 focus:border-transparent cursor-pointer hover:bg-gray-100 transition-colors"
+              className="appearance-none pl-4 pr-10 py-2 bg-white border border-green-200 rounded-xl text-sm font-medium text-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent cursor-pointer hover:bg-green-50 transition-colors"
             >
               {schoolYears.map((year) => (
                 <option key={year} value={year}>
@@ -44,7 +59,7 @@ export default function PlannerFilters({
                 </option>
               ))}
             </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-green-600">
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
               </svg>
@@ -55,15 +70,15 @@ export default function PlannerFilters({
           <button
             onClick={onSelectAll}
             disabled={allSelected}
-            className="text-sm font-medium text-dacapo-blue-600 hover:text-dacapo-blue-900 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors"
+            className="text-sm font-medium text-green-700 hover:text-green-900 disabled:text-green-300 disabled:cursor-not-allowed transition-colors"
           >
             Alles selecteren
           </button>
-          <span className="text-gray-300">|</span>
+          <span className="text-green-300">|</span>
           <button
             onClick={onDeselectAll}
             disabled={noneSelected}
-            className="text-sm font-medium text-dacapo-blue-600 hover:text-dacapo-blue-900 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors"
+            className="text-sm font-medium text-green-700 hover:text-green-900 disabled:text-green-300 disabled:cursor-not-allowed transition-colors"
           >
             Alles deselecteren
           </button>
@@ -75,10 +90,10 @@ export default function PlannerFilters({
           <label
             key={calendar.id}
             className={`
-              flex items-center space-x-3 cursor-pointer p-3 rounded-lg border transition-all duration-200
-              ${selectedCalendarIds.includes(calendar.id) 
-                ? 'bg-gray-50 border-gray-200 shadow-sm' 
-                : 'bg-white border-transparent hover:bg-gray-50'
+              flex items-center space-x-3 cursor-pointer p-3 rounded-xl border transition-all duration-200
+              ${selectedCalendarIds.includes(calendar.id)
+                ? 'bg-white border-green-200 shadow-sm'
+                : 'bg-white/50 border-transparent hover:bg-white'
               }
             `}
           >
@@ -87,7 +102,7 @@ export default function PlannerFilters({
                 type="checkbox"
                 checked={selectedCalendarIds.includes(calendar.id)}
                 onChange={() => onCalendarToggle(calendar.id)}
-                className="peer h-5 w-5 cursor-pointer appearance-none rounded-md border border-gray-300 transition-all checked:border-dacapo-blue-500 checked:bg-dacapo-blue-500 focus:ring-2 focus:ring-dacapo-blue-500/20"
+                className="peer h-5 w-5 cursor-pointer appearance-none rounded-md border border-green-300 transition-all checked:border-green-500 checked:bg-green-500 focus:ring-2 focus:ring-green-500/20"
               />
               <svg
                 className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100 transition-opacity"
@@ -112,8 +127,8 @@ export default function PlannerFilters({
                 className="w-3 h-3 rounded-full ring-2 ring-white shadow-sm"
                 style={{ backgroundColor: calendar.color }}
               />
-              <span className={`text-sm font-medium ${selectedCalendarIds.includes(calendar.id) ? 'text-gray-900' : 'text-gray-600'}`}>
-                {calendar.name}
+              <span className={`text-sm font-medium ${selectedCalendarIds.includes(calendar.id) ? 'text-green-900' : 'text-green-700'}`}>
+                {getBaseCalendarName(calendar.name)} {shortYear}
               </span>
             </div>
           </label>
