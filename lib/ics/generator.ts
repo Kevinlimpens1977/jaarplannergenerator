@@ -1,13 +1,11 @@
 import type { EventWithDetails } from '@/lib/types/database';
-import { parseISO, format } from 'date-fns';
+import { parseISO } from 'date-fns';
+
+// ==================== OUTLOOK-PROOF ICS RULESET ====================
 
 // Helper function to format date for ICS (YYYYMMDDTHHMMSSZ)
-function formatICSDate(date: Date, allDay: boolean = false): string {
-  if (allDay) {
-    // For all-day events, use date only format (YYYYMMDD)
-    return format(date, 'yyyyMMdd');
-  }
-  // For timed events, use UTC format
+// STRICT RULE: All values must be in this exact format: YYYYMMDDTHHMMSSZ
+function formatICSDate(date: Date): string {
   const year = date.getUTCFullYear();
   const month = String(date.getUTCMonth() + 1).padStart(2, '0');
   const day = String(date.getUTCDate()).padStart(2, '0');
@@ -27,9 +25,19 @@ function escapeICSText(text: string): string {
     .replace(/\n/g, '\\n');
 }
 
+// Sanitize category names
+// STRICT RULE: CATEGORIES may ONLY contain letters A–Z, digits 0–9, hyphens (-), commas (,)
+function sanitizeCategory(category: string): string {
+  if (!category) return '';
+  // Remove accents/diacritics
+  const normalized = category.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  // Keep only allowed chars
+  return normalized.replace(/[^a-zA-Z0-9-,]/g, '');
+}
+
 // Generate UID for event
 function generateUID(eventId: string): string {
-  return `${eventId}@dacapo-jaarplanner.nl`;
+  return `${eventId}@agendaplan`;
 }
 
 // Convert a single event to ICS VEVENT component
@@ -38,31 +46,48 @@ export function eventToICS(event: EventWithDetails): string {
   const endDate = parseISO(event.end_datetime);
   const now = new Date();
 
+  let dtStart: string;
+  let dtEnd: string;
+
+  // STRICT RULE: All-day events must be converted to UTC: Start at 00:00:00Z, End at 00:00:00Z the next day
+  if (event.all_day) {
+    // Create UTC dates for start and end
+    const utcStart = new Date(Date.UTC(startDate.getFullYear(), startDate.getMonth(), startDate.getDate(), 0, 0, 0));
+    
+    // End date is exclusive in ICS, so we add 1 day to the end date
+    // Assuming event.end_datetime is stored as the last day of the event
+    const utcEnd = new Date(Date.UTC(endDate.getFullYear(), endDate.getMonth(), endDate.getDate(), 0, 0, 0));
+    utcEnd.setUTCDate(utcEnd.getUTCDate() + 1);
+
+    dtStart = formatICSDate(utcStart);
+    dtEnd = formatICSDate(utcEnd);
+  } else {
+    // Timed events are already stored as ISO strings, just ensure they are formatted as UTC
+    dtStart = formatICSDate(startDate);
+    dtEnd = formatICSDate(endDate);
+  }
+
   const calendarNames = event.event_calendars
     .map((ec) => ec.calendars.name)
     .join(', ');
 
-  const categories = [
+  const rawCategories = [
     event.category || 'DaCapo',
     ...event.event_calendars.map((ec) => ec.calendars.name),
-  ]
-    .filter(Boolean)
+  ].filter(Boolean);
+
+  const categories = rawCategories
+    .map(sanitizeCategory)
+    .filter(c => c.length > 0)
     .join(',');
 
   let vevent = 'BEGIN:VEVENT\r\n';
   vevent += `UID:${generateUID(event.id)}\r\n`;
   vevent += `DTSTAMP:${formatICSDate(now)}\r\n`;
   
-  if (event.all_day) {
-    vevent += `DTSTART;VALUE=DATE:${formatICSDate(startDate, true)}\r\n`;
-    // ICS end date for all-day events is exclusive (next day)
-    const nextDay = new Date(endDate);
-    nextDay.setDate(nextDay.getDate() + 1);
-    vevent += `DTEND;VALUE=DATE:${formatICSDate(nextDay, true)}\r\n`;
-  } else {
-    vevent += `DTSTART:${formatICSDate(startDate)}\r\n`;
-    vevent += `DTEND:${formatICSDate(endDate)}\r\n`;
-  }
+  // STRICT RULE: NO “VALUE=DATE”, NO timezone offsets
+  vevent += `DTSTART:${dtStart}\r\n`;
+  vevent += `DTEND:${dtEnd}\r\n`;
 
   vevent += `SUMMARY:${escapeICSText(event.title)}\r\n`;
 
@@ -82,49 +107,27 @@ export function eventToICS(event: EventWithDetails): string {
     vevent += `LOCATION:${escapeICSText(event.location)}\r\n`;
   }
 
-  vevent += `CATEGORIES:${escapeICSText(categories)}\r\n`;
+  if (categories) {
+    vevent += `CATEGORIES:${categories}\r\n`;
+  }
+
   vevent += `STATUS:CONFIRMED\r\n`;
-  vevent += `TRANSP:${event.all_day ? 'TRANSPARENT' : 'OPAQUE'}\r\n`;
-  vevent += `ORGANIZER;CN=DaCapo College:mailto:noreply@dacapo-college.nl\r\n`;
+  vevent += `TRANSP:OPAQUE\r\n`;
   vevent += `END:VEVENT\r\n`;
 
   return vevent;
 }
 
 // Generate complete ICS file content
-export function generateICS(
-  events: EventWithDetails[], 
-  calendarName?: string,
-  calendarDescription?: string
-): string {
+// STRICT RULE: Create or fix a function called `generateOutlookICS(events)`
+export function generateOutlookICS(events: EventWithDetails[]): string {
+  // STRICT RULE: The file must start with specific VCALENDAR header
   let ics = 'BEGIN:VCALENDAR\r\n';
   ics += 'VERSION:2.0\r\n';
-  ics += 'PRODID:-//DaCapo College//Jaarplanner 26/27//NL\r\n';
+  ics += 'PRODID:-//AgendaPlan//Kevin Limpens//NL\r\n';
   ics += 'CALSCALE:GREGORIAN\r\n';
-  ics += 'METHOD:PUBLISH\r\n';
-  ics += `X-WR-CALNAME:${escapeICSText(calendarName || 'DaCapo Jaarplanner')}\r\n`;
-  ics += 'X-WR-TIMEZONE:Europe/Amsterdam\r\n';
   
-  if (calendarDescription) {
-    ics += `X-WR-CALDESC:${escapeICSText(calendarDescription)}\r\n`;
-  }
-
-  // Add timezone information for Europe/Amsterdam
-  ics += 'BEGIN:VTIMEZONE\r\n';
-  ics += 'TZID:Europe/Amsterdam\r\n';
-  ics += 'BEGIN:DAYLIGHT\r\n';
-  ics += 'TZOFFSETFROM:+0100\r\n';
-  ics += 'TZOFFSETTO:+0200\r\n';
-  ics += 'DTSTART:19700329T020000\r\n';
-  ics += 'RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU\r\n';
-  ics += 'END:DAYLIGHT\r\n';
-  ics += 'BEGIN:STANDARD\r\n';
-  ics += 'TZOFFSETFROM:+0200\r\n';
-  ics += 'TZOFFSETTO:+0100\r\n';
-  ics += 'DTSTART:19701025T030000\r\n';
-  ics += 'RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU\r\n';
-  ics += 'END:STANDARD\r\n';
-  ics += 'END:VTIMEZONE\r\n';
+  // STRICT RULE: Do NOT include any VTIMEZONE or TZID blocks.
 
   // Add all events
   events.forEach((event) => {
@@ -136,8 +139,14 @@ export function generateICS(
   return ics;
 }
 
+// Alias for backward compatibility, but using the new strict generator
+export const generateICS = generateOutlookICS;
+
 // Generate filename for ICS download
 export function generateICSFilename(prefix: string = 'dacapo-jaarplanner'): string {
-  const date = format(new Date(), 'yyyy-MM-dd');
-  return `${prefix}-${date}.ics`;
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${prefix}-${year}${month}${day}.ics`;
 }

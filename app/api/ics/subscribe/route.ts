@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { generateICS } from '@/lib/ics/generator';
+import { generateOutlookICS } from '@/lib/ics/generator';
 import type { Database } from '@/lib/types/database';
 
 export const dynamic = 'force-dynamic';
@@ -87,11 +87,7 @@ export async function GET(request: NextRequest) {
     console.log(`Filtered ${filteredEvents.length} events for calendars:`, calendarIds);
 
     // Generate ICS content - even if no events, still generate valid ICS
-    const icsContent = generateICS(
-      filteredEvents,
-      `DaCapo Jaarplanner - ${calendarNames}`,
-      `Abonnement op kalender(s): ${calendarNames}. Deze feed wordt automatisch bijgewerkt.`
-    );
+    const icsContent = generateOutlookICS(filteredEvents);
 
     // Return ICS file with appropriate headers for download
     return new NextResponse(icsContent, {
