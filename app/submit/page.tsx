@@ -94,6 +94,12 @@ export default function SubmitPage() {
       return;
     }
 
+    if (new Date(formData.start_date) > new Date(formData.end_date)) {
+      setError('Einddatum mag niet voor startdatum liggen');
+      setLoading(false);
+      return;
+    }
+
     if (formData.calendar_ids.length === 0) {
       setError('Selecteer minimaal één kalender');
       setLoading(false);

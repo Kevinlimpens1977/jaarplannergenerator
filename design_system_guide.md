@@ -1,199 +1,238 @@
-# Design System Guide: Emerald Modern UI
+# DaCapo Emerald UI — Enterprise Design System (v3)
+Versie: 3.0  
+Auteur: Kevin + ChatGPT  
+Doel: Eén consistente UI voor *alle* DaCapo tools
 
-Dit document beschrijft de exacte styling, kleuren en componenten die gebruikt worden in de Nieuwsbrief Generator applicatie. Gebruik deze gids om dezelfde "look and feel" te repliceren in andere applicaties.
+---
 
-## 1. Basis Configuratie (Tailwind CSS)
+# 0. PRINCIPES
+- Rustig, modern, schaalbaar  
+- Emerald-first kleuren  
+- Zachte gradients  
+- Pill-shaped knoppen  
+- Transparante glass-panels  
+- Geen harde zwarttinten, altijd `gray-900`  
+- Alles responsive-first  
+- Alles component-driven  
 
-Zorg dat je `tailwind.config.js` de volgende extensies bevat voor kleuren, fonts en border-radius.
+---
 
-```javascript
-// tailwind.config.js
+# 1. TAILWIND CONFIG (VOLLEDIG)
+```js
 export default {
   theme: {
     extend: {
       colors: {
-        accent: '#95C11F', // DaCapo Green
-        gray: {
-          50: '#F9FAFB',
-          100: '#F3F4F6',
-          200: '#E5E7EB',
-          300: '#D1D5DB',
-          400: '#9CA3AF',
-          500: '#6B7280',
-          600: '#4B5563',
-          700: '#374151',
-          800: '#1F2937',
-          900: '#111827',
+        accent: '#95C11F',
+        emerald: {
+          50:'#ECFDF5',100:'#D1FAE5',200:'#A7F3D0',
+          300:'#6EE7B7',400:'#34D399',500:'#10B981',
+          600:'#059669',700:'#047857',800:'#065F46',900:'#064E3B',
         },
+        gray: {
+          50:'#F9FAFB',100:'#F3F4F6',200:'#E5E7EB',300:'#D1D5DB',
+          400:'#9CA3AF',500:'#6B7280',600:'#4B5563',700:'#374151',
+          800:'#1F2937',900:'#111827'
+        }
       },
-      fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        display: ['Inter', 'system-ui', 'sans-serif'], // Of 'SF Pro Display' indien beschikbaar
-      },
-      borderRadius: {
-        '2xl': '1rem', // 16px - Standaard voor containers
-        'full': '9999px', // Voor knoppen (pill-shape)
-      },
-      boxShadow: {
-        'soft': '0 8px 24px rgba(0, 0, 0, 0.06)',
-      }
+      fontFamily:{ sans:['Inter'], display:['Inter'] },
+      borderRadius:{ '2xl':'1rem', full:'9999px' },
+      boxShadow:{ soft:'0 8px 24px rgba(0,0,0,0.06)' }
     },
   },
 };
 ```
 
-## 2. Global CSS & Custom Utilities
+---
 
-Voeg deze classes toe aan je `index.css` of global CSS bestand. Dit definieert de basisstijl voor kaarten, knoppen en inputs.
+# 2. GLOBAL CSS
 
 ```css
 @layer components {
-  /* 1. Containers (Glass Panel effect) */
+
+  .app-header {
+    @apply fixed top-0 left-0 w-full z-50 
+    bg-white/80 backdrop-blur-lg border-b border-gray-200 shadow-soft;
+  }
+
+  .emerald-container {
+    @apply bg-gradient-to-br from-emerald-50 to-green-50
+    border-2 border-emerald-200 rounded-2xl p-6 shadow-sm;
+  }
+
   .glass-panel {
-    @apply bg-white/80 backdrop-blur-md border border-white/60 rounded-2xl transition-all duration-200;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+    @apply bg-white/80 backdrop-blur-md border border-emerald-200 
+    rounded-2xl transition-all duration-200 shadow-soft;
   }
+  .glass-panel:hover { @apply bg-white/90 border-emerald-300; }
 
-  .glass-panel:hover {
-    @apply bg-white/90;
-  }
-
-  /* 2. Knoppen (Pill-shaped & Modern) */
   .btn {
-    @apply inline-flex items-center justify-center gap-2 px-4 h-10 rounded-full bg-white text-gray-900 border border-gray-200 transition duration-200 ease-in-out font-medium text-sm;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    @apply inline-flex items-center justify-center gap-2 rounded-full
+    px-4 h-10 bg-white text-gray-800 border border-emerald-200
+    whitespace-nowrap font-medium text-sm transition-all duration-200;
   }
+  .btn:hover { @apply bg-emerald-50 border-emerald-300; transform:translateY(-1px); }
 
-  .btn:hover {
-    @apply bg-gray-50 border-gray-300;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  }
-
-  .btn:active {
-    transform: translateY(0);
-  }
-
-  /* Primary Action Button (Emerald Green) */
   .btn-primary {
-    @apply bg-emerald-600 text-white border-transparent;
-    box-shadow: 0 2px 8px rgba(5, 150, 105, 0.2);
+    @apply bg-emerald-600 text-white border-emerald-600;
   }
+  .btn-primary:hover { @apply bg-emerald-700; }
 
-  .btn-primary:hover {
-    @apply bg-emerald-700;
-    background: linear-gradient(135deg, #059669 0%, #047857 100%);
-    box-shadow: 0 6px 20px rgba(5, 150, 105, 0.35);
-  }
-
-  /* 3. Form Inputs */
   .input {
-    @apply w-full px-3 h-10 rounded-2xl bg-white/90 border-2 border-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-300/50 focus:border-emerald-400 transition-all duration-200;
+    @apply w-full px-3 h-10 rounded-2xl bg-white border-2 border-emerald-200
+    focus:ring-2 focus:ring-emerald-300 focus:border-emerald-400;
   }
 }
 
-/* Body Background */
 body {
-  @apply bg-gradient-to-b from-[#f2f3f5] to-[#e8e8ea] bg-fixed text-gray-900 antialiased;
+  @apply bg-gradient-to-b from-[#f2f3f5] to-[#e8e8ea]
+  bg-fixed text-gray-900 antialiased;
 }
 ```
 
-## 3. Component Patronen
+---
 
-Gebruik deze HTML/JSX structuren om de specifieke look te krijgen.
+# 3. UI COMPONENTEN → STANDAARDSTRUCTUUR
 
-### A. De "Emerald Container" (Standaard Sectie)
-Dit is de kenmerkende container stijl die gebruikt wordt voor headers, filters en content blokken.
-
+## Button
 ```jsx
-<div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-2xl p-6 border-2 border-gray-300 shadow-sm">
-  {/* Header Content */}
-  <div className="flex items-center gap-4">
-    {/* Icoon Container */}
-    <div className="bg-gradient-to-br from-emerald-500 via-emerald-600 to-green-600 p-3 rounded-2xl shadow-lg">
-      <Icon size={28} className="text-white" strokeWidth={2} />
-    </div>
-    
-    {/* Tekst */}
-    <div className="flex-1">
-      <h1 className="text-2xl font-display font-semibold text-gray-900">Titel</h1>
-      <p className="text-gray-600 mt-1">Subtitel beschrijving</p>
-    </div>
-  </div>
-</div>
+export function Button({children,...props}) {
+  return <button className="btn" {...props}>{children}</button>;
+}
 ```
 
-### B. Navigatie Balk (Admin Stijl)
-Horizontale lijst met pill-shaped knoppen.
-
+## PrimaryButton
 ```jsx
-<div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-2xl p-6 border-2 border-gray-300 shadow-sm">
-  <h1 className="text-2xl font-display font-semibold text-gray-900 mb-4">Menu Titel</h1>
-  
-  <div className="flex flex-wrap items-center gap-3">
-    {/* Navigatie Item */}
-    <Link 
-      to="/path" 
-      className="inline-flex items-center gap-2 px-4 h-10 rounded-full bg-white text-gray-700 border-2 border-emerald-200 hover:bg-emerald-50 hover:border-emerald-300 transition-all duration-200 font-medium text-sm whitespace-nowrap shrink-0"
-    >
-      <Icon size={18} className="text-emerald-600" />
-      <span>Label</span>
-    </Link>
-
-    {/* Actief Item */}
-    <button className="inline-flex items-center gap-2 px-4 h-10 rounded-full bg-emerald-600 text-white border-emerald-600 transition-all duration-200 font-medium text-sm whitespace-nowrap shrink-0">
-      <Icon size={18} className="text-white" />
-      <span>Actief Label</span>
-    </button>
-  </div>
-</div>
+export function PrimaryButton({children,...props}) {
+  return <button className="btn-primary" {...props}>{children}</button>;
+}
 ```
 
-### C. Content Cards (Grid Items)
-Voor lijsten met items (zoals nieuwsbrieven).
-
+## EmeraldContainer
 ```jsx
-<div className="bg-white border-2 border-emerald-200 rounded-2xl p-4 hover:shadow-md hover:border-emerald-400 hover:bg-emerald-50/30 transition-all duration-200 cursor-pointer">
-  <div className="flex items-start justify-between gap-3">
-    <div className="flex-1">
-      <h3 className="text-sm font-semibold text-gray-900 mb-1">Item Titel</h3>
-      <p className="text-xs text-gray-500">Beschrijving of datum</p>
-    </div>
-    
-    {/* Actie Knoppen (Klein & Rond) */}
-    <div className="flex items-center gap-1">
-      <button className="p-2 hover:bg-emerald-100 rounded-full transition-colors">
-        <Icon size={18} className="text-emerald-600" />
-      </button>
-    </div>
-  </div>
-</div>
+export function EmeraldContainer({children}) {
+  return <div className="emerald-container">{children}</div>;
+}
 ```
 
-## 4. Kleurgebruik & Variaties
+## Card
+```jsx
+export function Card({children}) {
+  return <div className="glass-panel p-6">{children}</div>;
+}
+```
 
-*   **Standaard (Emerald)**:
-    *   Achtergrond: `from-emerald-50 to-green-50`
-    *   Border: `border-emerald-200` (normaal), `border-emerald-400` (hover)
-    *   Tekst: `text-emerald-700` (headers), `text-emerald-600` (iconen)
-    *   Gradient Icoon: `from-emerald-500 via-emerald-600 to-green-600`
+## PageHeader
+```jsx
+export function PageHeader({icon:Icon,title,subtitle}) {
+  return (
+    <div className="emerald-container mb-6">
+      <div className="flex items-center gap-4">
+        <div className="p-3 rounded-2xl bg-gradient-to-br from-emerald-500 via-emerald-600 to-green-600 shadow-lg">
+          <Icon size={28} className="text-white" />
+        </div>
+        <div>
+          <h1 className="text-2xl font-display font-semibold">{title}</h1>
+          <p className="text-gray-600 mt-1">{subtitle}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+```
 
-*   **Variatie (Purple - voor Ouders/Speciale secties)**:
-    *   Achtergrond: `from-purple-50 to-purple-100`
-    *   Border: `border-purple-200`
-    *   Tekst: `text-purple-700`
-    *   Hover: `hover:bg-purple-50`
+---
 
-## 5. Typografie Regels
+# 4. NAVIGATION BAR (STICKY)
 
-*   **Headers**: `font-display font-semibold text-gray-900`
-*   **Labels (Boven inputs)**: `text-[11px] font-bold text-emerald-700 tracking-[0.1em] uppercase`
-*   **Body Tekst**: `text-gray-600` of `text-gray-700` voor leesbaarheid
-*   **Font Size**: Gebruik `text-sm` (14px) voor de meeste interface elementen en knoppen.
+```jsx
+export function AdminNav() {
+  const items = [
+    {label:'Jarigen', href:'/jarigen', icon:Calendar},
+    {label:'Woord v/d Dag', href:'/woord', icon:BookOpen},
+    {label:'Nieuwsbrief Personeel', href:'/personeel', icon:Users},
+    {label:'Nieuwsbrief Ouders', href:'/ouders', icon:Users2},
+  ];
 
-## 6. Iconen
+  return (
+    <div className="emerald-container sticky top-20 z-40 mb-6">
+      <div className="flex flex-wrap gap-3">
+        {items.map(i=>(
+          <Link key={i.label} href={i.href} className="btn">
+            <i.icon size={18} className="text-emerald-600"/> {i.label}
+          </Link>
+        ))}
+        <button className="btn-primary"><LogOut size={18}/> Uitloggen</button>
+      </div>
+    </div>
+  );
+}
+```
 
-Gebruik **Lucide React** iconen.
-*   Standaard grootte in headers: `size={28}`
-*   Standaard grootte in knoppen: `size={18}`
-*   Stroke width: `strokeWidth={2}` voor headers, standaard voor de rest.
+---
+
+# 5. KLEURENPALET
+- **Emerald Light:** #ECFDF5  
+- **Emerald Medium:** #10B981  
+- **Emerald Dark:** #047857  
+- **Accent Groen:** #95C11F  
+- **Grijs (typografie):** gray-900, gray-700, gray-600  
+
+---
+
+# 6. TYPOGRAFIE
+- Headers → `font-display text-gray-900`
+- Body → `text-gray-700`
+- Labels → `text-[11px] uppercase tracking-wide font-bold text-emerald-700`
+
+---
+
+# 7. ICONEN
+Lucide React  
+- Headers: 28px  
+- Buttons: 18px  
+- strokeWidth: 2  
+
+---
+
+# 8. RESPONSIVE REGELS
+- Desktop: navigatie nooit op 2 regels  
+- Mobile: navigatie mag wrappen  
+- Cards: desktop 2–3 kolommen, mobiel 1 kolom  
+
+---
+
+# 9. STRUCTUUR DIE ALLE PROJECTEN MOET GEBRUIKEN
+```
+/components
+  /ui
+    Button.jsx
+    PrimaryButton.jsx
+    Card.jsx
+    EmeraldContainer.jsx
+    PageHeader.jsx
+    AdminNav.jsx
+
+/styles
+  globals.css
+  design-system.md
+
+/layout
+  AppHeader.jsx
+  PageLayout.jsx
+```
+
+---
+
+# 10. INSTALLATIE – IN NIEUW PROJECT
+```
+npx create-next-app myapp
+npm install lucide-react tailwindcss
+cp -r components/ui ./src/components/ui
+cp styles/globals.css ./src/app/globals.css
+cp design-system.md .
+```
+
+---
+
+# EINDE DESIGN SYSTEM V3

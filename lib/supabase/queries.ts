@@ -402,7 +402,7 @@ export async function batchCreateEvents(
     calendar_ids: string[];
   },
   dates: string[],
-  schoolYear: string = '2026-2027'
+  schoolYear: string
 ) {
   if (!supabase) {
     throw new Error('Supabase client is not initialized');
