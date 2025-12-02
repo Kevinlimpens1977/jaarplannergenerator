@@ -1,7 +1,7 @@
 'use client';
 
-import { parseISO, isWithinInterval, startOfDay, endOfDay } from 'date-fns';
-import { formatDateHeader } from '@/lib/utils/dateUtils';
+import { parseISO, isWithinInterval, startOfDay, endOfDay, format } from 'date-fns';
+import { nl } from 'date-fns/locale';
 import type { EventWithDetails } from '@/lib/types/database';
 import EventChip from './EventChip';
 
@@ -39,14 +39,14 @@ export default function WeekView({ weekDates, events, selectedCalendarIds }: Wee
 
   if (selectedCalendarIds.length === 0) {
     return (
-      <div className="bg-green-50 p-12 rounded-2xl shadow-sm border border-green-200 text-center">
-        <div className="text-green-200 mb-4">
+      <div className="bg-white p-12 rounded-2xl shadow-sm border border-gray-200 text-center">
+        <div className="text-gray-200 mb-4">
           <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
         </div>
-        <h3 className="text-lg font-semibold text-green-900 mb-2">Geen kalenders geselecteerd</h3>
-        <p className="text-green-700">
+        <h3 className="text-lg font-semibold text-gray-900 mb-2">Geen kalenders geselecteerd</h3>
+        <p className="text-gray-600">
           Selecteer minimaal één kalender in de filters om activiteiten te zien.
         </p>
       </div>
@@ -54,8 +54,8 @@ export default function WeekView({ weekDates, events, selectedCalendarIds }: Wee
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-green-200 overflow-hidden">
-      <div className={`grid gap-px bg-green-200 ${weekDates.length === 5 ? 'grid-cols-1 md:grid-cols-5' : 'grid-cols-1 md:grid-cols-7'}`}>
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className={`grid gap-px bg-gray-200 ${weekDates.length === 5 ? 'grid-cols-1 md:grid-cols-5' : 'grid-cols-1 md:grid-cols-7'}`}>
         {weekDates.map((date) => {
           const dayEvents = getEventsForDay(date);
           const isToday = isWithinInterval(new Date(), {
@@ -63,19 +63,22 @@ export default function WeekView({ weekDates, events, selectedCalendarIds }: Wee
             end: endOfDay(date),
           });
 
+          const dayName = format(date, 'EEEE', { locale: nl });
+          const dateStr = format(date, 'd MMMM', { locale: nl });
+
           return (
             <div key={date.toISOString()} className="bg-white min-h-[200px] md:min-h-[400px] flex flex-col">
               <div
                 className={`p-4 border-b ${
                   isToday
-                    ? 'bg-green-50 border-green-200'
+                    ? 'bg-emerald-50 border-emerald-200'
                     : 'bg-gray-50/50 border-gray-100'
                 }`}
               >
-                <div className={`font-semibold text-sm md:text-base ${isToday ? 'text-green-700' : 'text-gray-700'}`}>
-                  <div className="capitalize">{formatDateHeader(date).dayName}</div>
+                <div className={`font-semibold text-sm md:text-base ${isToday ? 'text-emerald-700' : 'text-gray-700'}`}>
+                  <div className="capitalize font-display">{dayName}</div>
                   <div className="text-xs md:text-sm font-normal text-gray-500 mt-0.5">
-                    {formatDateHeader(date).date}
+                    {dateStr}
                   </div>
                 </div>
               </div>

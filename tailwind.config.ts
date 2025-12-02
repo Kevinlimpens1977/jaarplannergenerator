@@ -9,37 +9,31 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
-        dacapo: {
-          orange: {
-            50: '#fff7ed',
-            100: '#ffedd5',
-            500: '#f97316',
-            600: '#ea580c',
-          },
-          green: {
-            50: '#f0fdf4',
-            100: '#dcfce7',
-            500: '#22c55e',
-            600: '#16a34a',
-          },
-          blue: {
-            50: '#eff6ff',
-            100: '#dbeafe',
-            500: '#3b82f6',
-            600: '#2563eb',
-            900: '#1e3a8a',
-          },
-          dark: {
-            900: '#111827', // Almost black for text
-            800: '#1f2937',
-          }
-        }
+        accent: '#95C11F', // DaCapo Green
+        gray: {
+          50: '#F9FAFB',
+          100: '#F3F4F6',
+          200: '#E5E7EB',
+          300: '#D1D5DB',
+          400: '#9CA3AF',
+          500: '#6B7280',
+          600: '#4B5563',
+          700: '#374151',
+          800: '#1F2937',
+          900: '#111827',
+        },
       },
       fontFamily: {
-        sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        display: ['Inter', 'system-ui', 'sans-serif'],
       },
+      borderRadius: {
+        '2xl': '1rem', // 16px - Standaard voor containers
+        'full': '9999px', // Voor knoppen (pill-shape)
+      },
+      boxShadow: {
+        'soft': '0 8px 24px rgba(0, 0, 0, 0.06)',
+      }
     },
   },
   plugins: [],

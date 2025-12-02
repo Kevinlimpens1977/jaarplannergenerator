@@ -156,7 +156,7 @@ export default function SubmitPage() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <h1 className="text-3xl font-bold mb-6 text-green-900">
+      <h1 className="text-3xl font-display font-bold mb-6 text-gray-900">
         Nieuwe activiteit indienen
       </h1>
 
@@ -166,10 +166,10 @@ export default function SubmitPage() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="bg-green-50 rounded-2xl shadow-sm border border-green-200 p-6 space-y-6">
+      <form onSubmit={handleSubmit} className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-2xl shadow-sm border-2 border-gray-300 p-6 space-y-6">
         {/* Titel */}
         <div>
-          <label htmlFor="title" className="block text-sm font-medium text-green-900 mb-2">
+          <label htmlFor="title" className="block text-[11px] font-bold text-emerald-700 tracking-[0.1em] uppercase mb-2">
             Titel *
           </label>
           <input
@@ -179,13 +179,13 @@ export default function SubmitPage() {
             value={formData.title}
             onChange={handleInputChange}
             required
-            className="w-full px-3 py-2 border border-green-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
+            className="input"
           />
         </div>
 
         {/* Beschrijving */}
         <div>
-          <label htmlFor="description" className="block text-sm font-medium text-green-900 mb-2">
+          <label htmlFor="description" className="block text-[11px] font-bold text-emerald-700 tracking-[0.1em] uppercase mb-2">
             Beschrijving
           </label>
           <textarea
@@ -194,13 +194,13 @@ export default function SubmitPage() {
             value={formData.description}
             onChange={handleInputChange}
             rows={4}
-            className="w-full px-3 py-2 border border-green-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
+            className="w-full px-3 py-2 rounded-2xl bg-white/90 border-2 border-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-300/50 focus:border-emerald-400 transition-all duration-200"
           />
         </div>
 
         {/* Schooljaar */}
         <div>
-          <label htmlFor="school_year" className="block text-sm font-medium text-green-900 mb-2">
+          <label htmlFor="school_year" className="block text-[11px] font-bold text-emerald-700 tracking-[0.1em] uppercase mb-2">
             Schooljaar *
           </label>
           <select
@@ -208,7 +208,7 @@ export default function SubmitPage() {
             name="school_year"
             value={formData.school_year}
             onChange={handleInputChange}
-            className="w-full px-3 py-2 border border-green-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
+            className="input"
           >
             <option value={currentSchoolYear}>{currentSchoolYear}</option>
             <option value={nextSchoolYear}>{nextSchoolYear}</option>
@@ -218,7 +218,7 @@ export default function SubmitPage() {
         {/* Datum en tijd */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label htmlFor="start_date" className="block text-sm font-medium text-green-900 mb-2">
+            <label htmlFor="start_date" className="block text-[11px] font-bold text-emerald-700 tracking-[0.1em] uppercase mb-2">
               Startdatum *
             </label>
             <input
@@ -228,12 +228,12 @@ export default function SubmitPage() {
               value={formData.start_date}
               onChange={handleInputChange}
               required
-              className="w-full px-3 py-2 border border-green-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
+              className="input"
             />
           </div>
 
           <div>
-            <label htmlFor="end_date" className="block text-sm font-medium text-green-900 mb-2">
+            <label htmlFor="end_date" className="block text-[11px] font-bold text-emerald-700 tracking-[0.1em] uppercase mb-2">
               Einddatum *
             </label>
             <input
@@ -243,22 +243,22 @@ export default function SubmitPage() {
               value={formData.end_date}
               onChange={handleInputChange}
               required
-              className="w-full px-3 py-2 border border-green-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
+              className="input"
             />
           </div>
         </div>
 
         {/* Hele dag checkbox */}
         <div>
-          <label className="flex items-center space-x-2">
+          <label className="flex items-center space-x-2 cursor-pointer">
             <input
               type="checkbox"
               name="all_day"
               checked={formData.all_day}
               onChange={handleInputChange}
-              className="w-4 h-4 text-green-600 rounded focus:ring-green-500 border-green-300"
+              className="w-5 h-5 text-emerald-600 rounded focus:ring-emerald-500 border-emerald-300"
             />
-            <span className="text-sm text-green-900">Dit is een hele dag activiteit</span>
+            <span className="text-sm font-medium text-gray-700">Dit is een hele dag activiteit</span>
           </label>
         </div>
 
@@ -266,7 +266,7 @@ export default function SubmitPage() {
         {!formData.all_day && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="start_time" className="block text-sm font-medium text-green-900 mb-2">
+              <label htmlFor="start_time" className="block text-[11px] font-bold text-emerald-700 tracking-[0.1em] uppercase mb-2">
                 Starttijd *
               </label>
               <input
@@ -276,12 +276,12 @@ export default function SubmitPage() {
                 value={formData.start_time}
                 onChange={handleInputChange}
                 required={!formData.all_day}
-                className="w-full px-3 py-2 border border-green-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
+                className="input"
               />
             </div>
 
             <div>
-              <label htmlFor="end_time" className="block text-sm font-medium text-green-900 mb-2">
+              <label htmlFor="end_time" className="block text-[11px] font-bold text-emerald-700 tracking-[0.1em] uppercase mb-2">
                 Eindtijd *
               </label>
               <input
@@ -291,7 +291,7 @@ export default function SubmitPage() {
                 value={formData.end_time}
                 onChange={handleInputChange}
                 required={!formData.all_day}
-                className="w-full px-3 py-2 border border-green-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
+                className="input"
               />
             </div>
           </div>
@@ -299,7 +299,7 @@ export default function SubmitPage() {
 
         {/* Categorie */}
         <div>
-          <label htmlFor="category" className="block text-sm font-medium text-green-900 mb-2">
+          <label htmlFor="category" className="block text-[11px] font-bold text-emerald-700 tracking-[0.1em] uppercase mb-2">
             Categorie
           </label>
           <select
@@ -307,7 +307,7 @@ export default function SubmitPage() {
             name="category"
             value={formData.category}
             onChange={handleInputChange}
-            className="w-full px-3 py-2 border border-green-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
+            className="input"
           >
             <option value="">Selecteer categorie</option>
             <option value="vakantie">Vakantie</option>
@@ -322,7 +322,7 @@ export default function SubmitPage() {
 
         {/* Locatie */}
         <div>
-          <label htmlFor="location" className="block text-sm font-medium text-green-900 mb-2">
+          <label htmlFor="location" className="block text-[11px] font-bold text-emerald-700 tracking-[0.1em] uppercase mb-2">
             Locatie
           </label>
           <input
@@ -331,13 +331,13 @@ export default function SubmitPage() {
             name="location"
             value={formData.location}
             onChange={handleInputChange}
-            className="w-full px-3 py-2 border border-green-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
+            className="input"
           />
         </div>
 
         {/* Doelgroep */}
         <div>
-          <label htmlFor="audience" className="block text-sm font-medium text-green-900 mb-2">
+          <label htmlFor="audience" className="block text-[11px] font-bold text-emerald-700 tracking-[0.1em] uppercase mb-2">
             Doelgroep
           </label>
           <input
@@ -347,33 +347,33 @@ export default function SubmitPage() {
             value={formData.audience}
             onChange={handleInputChange}
             placeholder="Bijv. Alle leerlingen, BB/KB Onderbouw, GT Bovenbouw"
-            className="w-full px-3 py-2 border border-green-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
+            className="input"
           />
         </div>
 
         {/* Kalenders */}
         <div>
-          <label className="block text-sm font-medium text-green-900 mb-2">
+          <label className="block text-[11px] font-bold text-emerald-700 tracking-[0.1em] uppercase mb-2">
             Kalenders * (selecteer minimaal één)
           </label>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {calendars.map((calendar) => (
               <label
                 key={calendar.id}
-                className="flex items-center space-x-2 cursor-pointer hover:bg-green-100 p-2 rounded-xl transition-colors"
+                className="flex items-center space-x-3 cursor-pointer hover:bg-white/50 p-3 rounded-xl border-2 border-transparent hover:border-emerald-200 transition-all"
               >
                 <input
                   type="checkbox"
                   checked={formData.calendar_ids.includes(calendar.id)}
                   onChange={() => handleCalendarToggle(calendar.id)}
-                  className="w-4 h-4 text-green-600 rounded focus:ring-green-500 border-green-300"
+                  className="w-5 h-5 text-emerald-600 rounded focus:ring-emerald-500 border-gray-300"
                 />
                 <div className="flex items-center space-x-2">
                   <div
-                    className="w-4 h-4 rounded"
+                    className="w-4 h-4 rounded-full ring-2 ring-white shadow-sm"
                     style={{ backgroundColor: calendar.color }}
                   />
-                  <span className="text-sm text-green-900">{calendar.name}</span>
+                  <span className="text-sm font-medium text-gray-700">{calendar.name}</span>
                 </div>
               </label>
             ))}
@@ -385,14 +385,14 @@ export default function SubmitPage() {
           <button
             type="submit"
             disabled={loading}
-            className="px-6 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed shadow-sm font-medium"
+            className="btn btn-primary px-8"
           >
             {loading ? 'Indienen...' : 'Activiteit indienen'}
           </button>
           <button
             type="button"
             onClick={() => router.push('/planner')}
-            className="px-6 py-3 bg-white border border-green-200 text-green-700 rounded-xl hover:bg-green-50 transition-colors shadow-sm font-medium"
+            className="btn hover:bg-gray-50"
           >
             Annuleren
           </button>
