@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getEvents } from '@/lib/supabase/queries';
-import { generateOutlookICS, generateICSFilename } from '@/lib/ics/generator';
+import { generateICSContent, generateICSFilename } from '@/lib/ics/generator';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Generate ICS file
-    const icsContent = generateOutlookICS(events);
+    const icsContent = generateICSContent(events);
     const filename = generateICSFilename(`dacapo-${schoolYear.replace('/', '-')}`);
 
     // Return ICS file

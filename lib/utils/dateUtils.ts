@@ -109,6 +109,14 @@ export function getMonthName(date: Date) {
   return format(date, 'MMMM yyyy', { locale: nl });
 }
 
+export function formatToUTCString(date: Date): string {
+  return date
+    .toISOString()
+    .replace(/[-:]/g, '')  // Remove dashes and colons
+    .replace(/\.\d{3}/, '') // Remove milliseconds
+    .replace(/[+-]\d{2}:?\d{2}$/, 'Z'); // Ensure Z suffix
+}
+
 export function getCurrentSchoolYear(date: Date = new Date()): string {
   const year = date.getFullYear();
   const month = date.getMonth(); // 0-11

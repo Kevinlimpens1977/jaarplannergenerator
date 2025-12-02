@@ -24,6 +24,7 @@ export interface Calendar {
 
 export interface Event {
   id: string;
+  uid: string;
   title: string;
   description: string | null;
   school_year: string;
@@ -73,6 +74,7 @@ export interface EventWithDetails extends Event {
 
 // Formulier types
 export interface EventFormData {
+  uid?: string;
   title: string;
   description: string;
   school_year: string;
@@ -110,7 +112,7 @@ export interface Database {
       };
       events: {
         Row: Event;
-        Insert: Omit<Event, 'id' | 'created_at' | 'updated_at'>;
+        Insert: Omit<Event, 'id' | 'uid' | 'created_at' | 'updated_at'>;
         Update: Partial<Omit<Event, 'id' | 'created_at' | 'updated_at'>>;
       };
       event_calendars: {
