@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Info } from 'lucide-react';
 import type { EventWithDetails } from '@/lib/types/database';
 import { format, parseISO, addDays } from 'date-fns';
 
@@ -129,8 +130,9 @@ export default function CopyEventModal({ event, isOpen, onClose, onCopy }: CopyE
             </div>
           )}
 
-          <div className="bg-blue-50 p-3 rounded-lg text-sm text-blue-800">
-            <p>ℹ️ De activiteit wordt gekopieerd met alle eigenschappen (titel, beschrijving, kalenders, etc.). De tijd blijft hetzelfde.</p>
+          <div className="bg-blue-50 p-3 rounded-lg text-sm text-blue-800 flex items-start gap-2">
+            <Info size={16} className="text-blue-600 flex-shrink-0 mt-0.5" />
+            <p>De activiteit wordt gekopieerd met alle eigenschappen (titel, beschrijving, kalenders, etc.). De tijd blijft hetzelfde.</p>
           </div>
 
           <div className="flex gap-3 pt-4 border-t">

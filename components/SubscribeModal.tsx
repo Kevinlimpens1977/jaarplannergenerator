@@ -1,5 +1,7 @@
 'use client';
 
+import { Copy, Download, AlertCircle, Lightbulb, CheckCircle, Calendar, Globe } from 'lucide-react';
+
 interface SubscribeModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -13,9 +15,9 @@ export default function SubscribeModal({ isOpen, onClose, subscribeUrl }: Subscr
     navigator.clipboard.writeText(subscribeUrl).then(() => {
       const button = document.getElementById('copy-btn');
       if (button) {
-        button.textContent = '✓ Gekopieerd!';
+        button.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Gekopieerd!';
         setTimeout(() => {
-          button.textContent = 'Kopieer link';
+          button.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>Kopieer link';
         }, 2000);
       }
     });
@@ -60,9 +62,7 @@ export default function SubscribeModal({ isOpen, onClose, subscribeUrl }: Subscr
             <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
               <div className="flex">
                 <div className="flex-shrink-0">
-                  <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                  </svg>
+                  <AlertCircle className="h-5 w-5 text-yellow-400" />
                 </div>
                 <div className="ml-3">
                   <p className="text-sm text-yellow-700">
@@ -139,8 +139,9 @@ export default function SubscribeModal({ isOpen, onClose, subscribeUrl }: Subscr
             <div className="flex-1">
               <h3 className="font-semibold text-lg mb-2">Ga naar Kalender</h3>
               <p className="text-gray-700 mb-2">Klik op het kalender icoon onderaan Outlook</p>
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm">
-                <p className="text-blue-800">💡 <strong>Tip:</strong> Of gebruik de sneltoets <kbd className="bg-white px-2 py-1 rounded border">Ctrl + 2</kbd></p>
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm flex items-start gap-2">
+                <Lightbulb size={18} className="text-blue-600 flex-shrink-0 mt-0.5" />
+                <p className="text-blue-800"><strong>Tip:</strong> Of gebruik de sneltoets <kbd className="bg-white px-2 py-1 rounded border">Ctrl + 2</kbd></p>
               </div>
             </div>
           </div>
@@ -158,9 +159,12 @@ export default function SubscribeModal({ isOpen, onClose, subscribeUrl }: Subscr
               <h3 className="font-semibold text-lg mb-2">Kalender toevoegen</h3>
               <p className="text-gray-700 mb-2">Klik in het menu op:</p>
               <div className="space-y-2">
-                <div className="bg-gray-50 border-l-4 border-blue-600 p-3">
-                  <p className="font-semibold">📅 Start → Kalender toevoegen</p>
-                  <p className="text-sm text-gray-600 mt-1">of klik met rechtermuisknop op "Mijn agenda's"</p>
+                <div className="bg-gray-50 border-l-4 border-blue-600 p-3 flex items-start gap-2">
+                  <Calendar size={18} className="text-blue-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-semibold">Start → Kalender toevoegen</p>
+                    <p className="text-sm text-gray-600 mt-1">of klik met rechtermuisknop op "Mijn agenda's"</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -178,9 +182,12 @@ export default function SubscribeModal({ isOpen, onClose, subscribeUrl }: Subscr
             <div className="flex-1">
               <h3 className="font-semibold text-lg mb-2">Kies "Abonneren vanaf web"</h3>
               <p className="text-gray-700 mb-2">Selecteer in het popup menu:</p>
-              <div className="bg-gray-50 border-l-4 border-green-600 p-3">
-                <p className="font-semibold">🌐 Abonneren vanaf web</p>
-                <p className="text-sm text-gray-600 mt-1">Ook wel "Subscribe from web" of "Van internet" genoemd</p>
+              <div className="bg-gray-50 border-l-4 border-green-600 p-3 flex items-start gap-2">
+                <Globe size={18} className="text-green-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-semibold">Abonneren vanaf web</p>
+                  <p className="text-sm text-gray-600 mt-1">Ook wel "Subscribe from web" of "Van internet" genoemd</p>
+                </div>
               </div>
             </div>
           </div>
@@ -197,9 +204,12 @@ export default function SubscribeModal({ isOpen, onClose, subscribeUrl }: Subscr
             <div className="flex-1">
               <h3 className="font-semibold text-lg mb-2">Plak de URL</h3>
               <p className="text-gray-700 mb-2">Plak de gekopieerde link in het veld en klik op <strong>"Importeren"</strong></p>
-              <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                <p className="text-green-800 font-semibold">✓ Klaar!</p>
-                <p className="text-green-700 text-sm mt-1">De kalender verschijnt nu in Outlook en wordt automatisch gesynchroniseerd met nieuwe activiteiten.</p>
+              <div className="bg-green-50 border border-green-200 rounded-lg p-3 flex items-start gap-2">
+                <CheckCircle size={18} className="text-green-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-green-800 font-semibold">Klaar!</p>
+                  <p className="text-green-700 text-sm mt-1">De kalender verschijnt nu in Outlook en wordt automatisch gesynchroniseerd met nieuwe activiteiten.</p>
+                </div>
               </div>
             </div>
           </div>
@@ -208,8 +218,9 @@ export default function SubscribeModal({ isOpen, onClose, subscribeUrl }: Subscr
         {/* Footer */}
         <div className="bg-gray-50 px-6 py-4 rounded-b-lg border-t border-gray-200">
           <div className="flex items-center justify-between">
-            <div className="text-sm text-gray-600">
-              <p>💡 De kalender synchroniseert automatisch</p>
+            <div className="text-sm text-gray-600 flex items-center gap-2">
+              <Lightbulb size={16} className="text-gray-500" />
+              <p>De kalender synchroniseert automatisch</p>
             </div>
             <button
               onClick={onClose}
